@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MyAngularApp.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace MyAngularApp
 {
@@ -27,6 +29,12 @@ namespace MyAngularApp
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=MyAngulrAppStorage;Trusted_Connection=True;ConnectRetryCount=0";
+            services.AddDbContext<Context>
+                (options => options.UseSqlServer(connection));
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

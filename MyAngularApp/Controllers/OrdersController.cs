@@ -22,14 +22,15 @@ namespace MyAngularApp.Controllers
 
         // GET: api/Orders
         [HttpGet]
-        public IEnumerable<Order> GetOrders()
+        public IEnumerable<Order> GetAllOrders()
         {
             return _context.Orders;
         }
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrder([FromRoute] int id)
+        [Route("~/api/Orders/Customer")]
+        public async Task<IActionResult> GetCustomerOrders([FromRoute] int customerId )
         {
             if (!ModelState.IsValid)
             {
@@ -48,7 +49,7 @@ namespace MyAngularApp.Controllers
 
         // PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder([FromRoute] int id, [FromBody] Order order)
+        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] Order order)
         {
             if (!ModelState.IsValid)
             {
@@ -83,7 +84,7 @@ namespace MyAngularApp.Controllers
 
         // POST: api/Orders
         [HttpPost]
-        public async Task<IActionResult> PostOrder([FromBody] Order order)
+        public async Task<IActionResult> NewOrder([FromBody] Order order)
         {
             if (!ModelState.IsValid)
             {
@@ -96,35 +97,30 @@ namespace MyAngularApp.Controllers
             return CreatedAtAction("GetOrder", new { id = order.Id }, order);
         }
 
-        // DELETE: api/Orders/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
-
-            return Ok(order);
-        }
-
-        private bool OrderExists(int id)
-        {
-            return _context.Orders.Any(e => e.Id == id);
-        }
-
+     
         // GET: api/Orders/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetScheduledOrder([FromRoute] int id)
+        [Route("~/api/Orders/scheduled")]
+        [HttpGet]
+        public async Task<IActionResult> GetScheduledOrders()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var order = await _context.Orders.FindAsync(1);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
+
+        [Route("~/api/Orders/Completed")]
+        [HttpPost]
+        public async Task<IActionResult> GetCompletedOrders([FromRoute] DateTime begin, [FromRoute] DateTime end)
         {
             if (!ModelState.IsValid)
             {
@@ -140,5 +136,59 @@ namespace MyAngularApp.Controllers
 
             return Ok(order);
         }
+
+        [Route("~/api/Orders/Complete")]
+        [HttpPost]
+        public async Task<IActionResult> CompleteOrder([FromBody] CompletedOrder completed)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+           var order = await _context.Orders.FindAsync(completed.OrderId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
+
+        public class CompletedOrder
+        {
+            public int OrderId { get; set; }
+            public string Comments { get; set; }
+            public DateTime Completed { get; set; }
+            public string Asset { get; set; }
+        }
+
+        // DELETE: api/Orders/5
+        // [HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteOrder([FromRoute] int id)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    var order = await _context.Orders.FindAsync(id);
+        //    if (order == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Orders.Remove(order);
+        //    await _context.SaveChangesAsync();
+
+        //    return Ok(order);
+        //}
+
+        // private bool OrderExists(int id)
+        //{
+        //    return _context.Orders.Any(e => e.Id == id);
+        //}
+
     }
 }

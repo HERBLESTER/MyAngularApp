@@ -13,11 +13,10 @@ const httpOptions = {
 export class OrderDataService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+
   public orders: Order[];
-  getOrders() {
-    return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders').subscribe(result => {
-      this.orders = result;
-    }, error => console.error(error));
+  getOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders');
   }
 
   getCustomerOrders() { }

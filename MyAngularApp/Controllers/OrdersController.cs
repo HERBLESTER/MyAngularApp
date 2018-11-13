@@ -25,8 +25,19 @@ namespace MyAngularApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
+            IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
+                .Select(o => new OrderVM {
+                id = o.Id,
+                cityName = o.City.Name,
+                customerName = o.Customer.Name,
+                dateReceived = o.DateReceived,
+                notes = o.Notes,
+                operationName = o.Operation.Name,
+                status = o.Status,
+                street = o.Street
+            }).OrderByDescending(o => o.dateReceived);
 
-            IEnumerable<Order> orders  = await _context.Orders.ToListAsync();
+            IEnumerable<OrderVM> orders = await orderVMs.ToListAsync();
 
             return Ok(orders);
         }
@@ -97,10 +108,21 @@ namespace MyAngularApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            //_context.Orders.Add(order);
+            Order o = new Order
+            {
+                CityId = order.cityId,
+                CustomerId = order.customerId,
+                DateReceived = order.dateReceived,
+                Notes = order.notes,
+                OperationId = order.operationId,
+                Status = Status.Received,
+                Street = order.street
+            };
+
+            _context.Orders.Add(o);
             await _context.SaveChangesAsync();
        
-            return CreatedAtAction("GetOrder", new { id = order.id }, order);
+            return CreatedAtAction("GetOrder", new { id = o.Id }, o);
         }
 
      
@@ -178,7 +200,7 @@ namespace MyAngularApp.Controllers
             public string street;
             public int cityId;
             public string cityName;
-            public DateTime datePlaced;
+            public DateTime dateReceived;
             public int operationId;
             public string operationName;
             public string notes;

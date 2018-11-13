@@ -26,8 +26,7 @@ export class NewOrderComponent implements OnInit {
   
   onSubmit() {
     this.submitted = true;
-    this.model.datePlaced = new Date();
-    
+  
     this.orderDataService.newOrder(this.model);
   }
 

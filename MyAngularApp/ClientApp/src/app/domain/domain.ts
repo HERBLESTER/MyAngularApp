@@ -28,7 +28,7 @@ export class Order {
   public street: string;
   public cityId: number;
   public cityName: string;
-  public datePlaced: Date;
+  public dateReceived: Date;
   public operationId: number;
   public operationName: string;
   public notes: string;

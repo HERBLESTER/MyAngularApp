@@ -5,19 +5,19 @@
       <div class="form-group">
         <label for="customer">Customer</label>
         <select class="form-control" id="customer" required [(ngModel)]="model.customerId" name="customer">
-          <option *ngFor="let customer of customers" [value]="customer.id">{{customer.name}}</option>
+          <option *ngFor="let customer of metaData.customers" [value]="customer.id">{{customer.name}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="city">City</label>
         <select class="form-control" id="city" required [(ngModel)]="model.cityId" name="city">
-          <option *ngFor="let city of cities" [value]="city.id">{{city.name}}</option>
+          <option *ngFor="let city of metaData.cities" [value]="city.id">{{city.name}}</option>
         </select>
       </div>
       <div class="form-group">
         <label for="operation">Operation</label>
         <select class="form-control" id="operation" required [(ngModel)]="model.operationId" name="operation">
-          <option *ngFor="let operation of operations" [value]="operation.id">{{operation.name}}</option>
+          <option *ngFor="let operation of metaData.operations" [value]="operation.id">{{operation.name}}</option>
         </select>
       </div>
       <div class="form-group">
@@ -27,7 +27,6 @@
              class="alert alert-danger">
           Street is required
         </div>
-        {{model.street}}
       </div>
       <div class="form-group">
         <label for="notes">Notes</label>

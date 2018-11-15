@@ -8,6 +8,7 @@ import { Customer } from '../domain/domain';
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-new-order',
@@ -19,22 +20,34 @@ export class NewOrderComponent implements OnInit {
 
   submitted = false;
 
-  cities: City[];
-  customers: Customer[];
-  operations: Operation[];
+  subscription: Subscription;
+  metaData: MetaData;
+
+  //cities: City[];
+  //customers: Customer[];
+  //operations: Operation[];
   model: Order;
   
   onSubmit() {
     this.submitted = true;
   
     this.orderDataService.newOrder(this.model);
-  }
-
-  ngOnInit() {
-    this.metaDataService.metaData.subscribe(result => this.operations = result.operations);
-    this.metaDataService.metaData.subscribe(result => this.cities = result.cities);
-    this.metaDataService.metaData.subscribe(result => this.customers = result.customers);
     this.model = new Order();
   }
 
+  ngOnInit() {
+    this.subscription = this.metaDataService.metaData.subscribe(result => this.metaData = result);
+
+    //this.metaDataService.metaData.subscribe(result => this.operations = result.operations);
+    //this.metaDataService.metaData.subscribe(result => this.cities = result.cities);
+    //this.metaDataService.metaData.subscribe(result => this.customers = result.customers);
+    this.model = new Order();
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+
+  }
 }

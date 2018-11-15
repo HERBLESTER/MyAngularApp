@@ -16,6 +16,8 @@ import { CompletedOrdersComponent } from './completed-orders/completed-orders.co
 import { ScheduledOrdersComponent } from './scheduled-orders/scheduled-orders.component';
 import { MetaDataService } from './services/meta-data.service';
 import { OrderDataService } from './services/order-data.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,8 @@ import { OrderDataService } from './services/order-data.service';
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserAnimationsModule,
+    ToastrModule.forRoot(),
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([

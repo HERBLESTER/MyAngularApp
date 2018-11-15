@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
-import { TypeofExpr } from '@angular/compiler';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-browse-orders',
@@ -14,11 +14,9 @@ export class BrowseOrdersComponent implements OnInit {
   constructor(public orderDataService: OrderDataService) { }
 
   public Status = Status;
-  public orders: Order[];
+  public orders: Observable<Order[]>;
 
   ngOnInit() {
-    this.orderDataService.getOrders().subscribe(result => {
-      this.orders = result;
-    }, error => console.error(error));;
+    this.orders = this.orderDataService.getOrders();
   }
 }

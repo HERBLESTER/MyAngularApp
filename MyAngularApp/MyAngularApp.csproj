@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\src\app\services\" />
+    <Folder Include="ClientApp\src\app\state-store\actions\" />
+    <Folder Include="ClientApp\src\app\state-store\effects\" />
+    <Folder Include="ClientApp\src\app\state-store\reducers\" />
+    <Folder Include="ClientApp\src\app\state-store\state\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

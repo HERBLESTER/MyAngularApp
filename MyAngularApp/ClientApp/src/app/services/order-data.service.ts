@@ -3,7 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Order } from '../domain/domain';
 import { CompletedOrder } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, tap, retry } from 'rxjs/operators';
+import { ErrorHandlerService } from '../services/error-handler.service';
+import { error } from 'util';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -14,16 +16,24 @@ export class OrderDataService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  public orders: Order[];
+  //public orders: Order[];
+  
   getOrders(): Observable<Order[]> {
-    return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders');
+    return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders')
+      .pipe(
+      retry(3), // retry a failed request up to 3 times
+      catchError(ErrorHandlerService.handleError));
   }
 
   getCustomerOrders() { }
   updateOrder(order: Order) { }
 
   newOrder(order: Order): void {
-    this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions).subscribe(result => result);
+    this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)
+      .pipe(catchError(ErrorHandlerService.handleError))
+      .subscribe(
+        result => result  //todo: add to cache
+      );
   }
 
   getScheduledOrders() { }

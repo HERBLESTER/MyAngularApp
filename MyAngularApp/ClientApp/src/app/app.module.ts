@@ -23,14 +23,9 @@ import { ToastrModule } from 'ngx-toastr';
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent,
-    CounterComponent,
-    FetchDataComponent,
     NewOrderComponent,
     BrowseOrdersComponent,
     SearchOrdersComponent,
-    CompletedOrdersComponent,
-    ScheduledOrdersComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -39,15 +34,10 @@ import { ToastrModule } from 'ngx-toastr';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
       { path: 'new-order', component: NewOrderComponent },
-      { path: 'browse-orders', component: BrowseOrdersComponent },
-      { path: 'search-orders', component: SearchOrdersComponent },
-      { path: 'completed-orders', component: CompletedOrdersComponent },
-      { path: 'scheduled-orders', component: ScheduledOrdersComponent },
-    ])
+      { path: 'update-order/:id', component: NewOrderComponent },
+      { path: '', component: BrowseOrdersComponent, pathMatch: 'full' },
+    ], { enableTracing: true })
   ],
   providers: [MetaDataService, OrderDataService],
   bootstrap: [AppComponent]

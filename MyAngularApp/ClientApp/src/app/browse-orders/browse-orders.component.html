@@ -1,25 +1,56 @@
 <p *ngIf="!orders"><em>Loading...</em></p>
-<table class="table" *ngIf="orders">
-  <thead>
-    <tr>
-      <th>Date Received</th>
-      <th>Customer</th>
-      <th>City</th>
-      <th>Street</th>
-      <th>Operation</th>
-      <th>Notes</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let order of orders | async">
-      <td>{{order.dateReceived | date:'short'}}</td>
-      <td>{{order.customerName}}</td>
-      <td>{{order.cityName}}</td>
-      <td>{{order.street}}</td>
-      <td>{{order.operationName}}</td>
-      <td>{{order.notes}}</td>
-      <td>{{Status[order.status]}}</td>
-    </tr>
-  </tbody>
-</table>
+<div class="container-fluid">
+  <div class="row">
+    <div [class.col-md-8]="showDetail">
+      <div class='panel panel-primary'>
+        <div class='panel-heading'>
+          <p>
+            Browse Orders
+            <button *ngIf="!showDetail" class="btn btn-primary panel-title pull-right" (click)="showNewOrder()">New Order </button>
+            <!--<a class="btn btn-primary panel-title pull-right" [routerLink]="[{ outlets: { detail: ['new-order'] } }]">New Order</a>-->
+          </p>
+        </div>
+        <!--<div class='panel-body'>-->
+        <div class=' table table-responsive'>
+          <table class="table" *ngIf="orders">
+            <thead>
+              <tr>
+                <th>Date Received</th>
+                <th>Customer</th>
+                <th>City</th>
+                <th>Street</th>
+                <th>Operation</th>
+                <th>Notes</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of orders | async">
+                <td>{{order.dateReceived | date:'short'}}</td>
+                <td>{{order.customerName}}</td>
+                <td>{{order.cityName}}</td>
+                <td>{{order.street}}</td>
+                <td>{{order.operationName}}</td>
+                <td>{{order.notes}}</td>
+                <td>{{Status[order.status]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!--</div>-->
+      </div>
+      </div>
+      <div class="col-md-4" *ngIf="showDetail">
+        <div class='panel panel-primary'>
+          <div class='panel-heading'>
+            <p>{{detailTitle}}</p>
+          </div>
+          <div class='panel-body'>
+            <router-outlet name="detail">
+            </router-outlet>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

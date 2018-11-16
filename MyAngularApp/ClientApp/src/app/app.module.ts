@@ -34,9 +34,13 @@ import { ToastrModule } from 'ngx-toastr';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: 'new-order', component: NewOrderComponent },
-      { path: 'update-order/:id', component: NewOrderComponent },
-      { path: '', component: BrowseOrdersComponent, pathMatch: 'full' },
+      {
+        path: 'browse-orders', component: BrowseOrdersComponent,
+        children: [
+          { path: 'new-order', component: NewOrderComponent, outlet: "detail" },
+          { path: 'update-order/:id', component: NewOrderComponent, outlet: "detail" }]
+      },
+      { path: '', redirectTo: '/browse-orders', pathMatch: 'full'}
     ], { enableTracing: true })
   ],
   providers: [MetaDataService, OrderDataService],

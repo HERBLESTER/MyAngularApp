@@ -16,8 +16,6 @@ export class OrderDataService {
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
 
-  //public orders: Order[];
-  
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders')
       .pipe(
@@ -40,9 +38,4 @@ export class OrderDataService {
   getCompletedOrders(begin: Date, end: Date) { }
   completeOrder(completedOrder: CompletedOrder) { }
 }
-interface WeatherForecast {
-  dateFormatted: string;
-  temperatureC: number;
-  temperatureF: number;
-  summary: string;
-}
+

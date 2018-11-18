@@ -57,5 +57,7 @@ export class BrowseOrdersComponent implements OnInit {
       this.detailStateSubscription.unsubscribe();
     if (this.orderSubscription)
       this.orderSubscription.unsubscribe();
+    if (this.newOrderAddedSubscription)
+      this.newOrderAddedSubscription.unsubscribe();
   }
 }

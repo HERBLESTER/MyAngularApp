@@ -1,4 +1,4 @@
-import { Component, OnInit, Directive, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Directive, Output, EventEmitter, HostListener, ViewChild } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
@@ -10,16 +10,31 @@ import { Status } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
 import { UtilitiesService } from '../services/utilities.service';
+import { NgForm } from '@angular/forms';
+
+export interface ComponentCanDeactivate {
+  canDeactivate: () => boolean | Observable<boolean>;
+}
+
+export class PendingChangesGuard implements CanDeactivate<ComponentCanDeactivate> {
+  canDeactivate(component: ComponentCanDeactivate): boolean | Observable<boolean> {
+    if (component.canDeactivate()) {
+      return true;
+    } else {
+      confirm('You have unsaved changes. Press Cancel to go back and save these changes, or OK to lose these changes.');
+    }
+  }
+}
 
 @Component({
-  selector: 'app-new-order',
+  selector: 'app-order-detail',
   templateUrl: './new-order.component.html',
   styleUrls: ['./new-order.component.css']
 })
-export class NewOrderComponent implements OnInit {
+export class NewOrderComponent implements OnInit, ComponentCanDeactivate {
   constructor(
     private utilities: UtilitiesService,
     public orderDataService: OrderDataService,
@@ -28,6 +43,13 @@ export class NewOrderComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private orderCompositeService: OrderCompositeService) { }
+
+  @ViewChild('orderForm') public userFrm: NgForm;
+
+  @HostListener('window:beforeunload')
+  canDeactivate(): boolean {
+    return !this.userFrm.dirty;
+  }
 
   submitted = false;
 
@@ -40,7 +62,7 @@ export class NewOrderComponent implements OnInit {
     this.orderCompositeService.setDetailState(false);
   }
 
-  onSubmit() {
+  onSubmit(form: NgForm) {
     this.submitted = true;
   
     this.orderDataService.newOrder(this.model)
@@ -48,7 +70,6 @@ export class NewOrderComponent implements OnInit {
         this.orderCompositeService.signalNewOrderAdded(result));
 
     this.toastr.success('Order Added!', 'Success!');
-    ;
 
     this.model = new Order();
   }

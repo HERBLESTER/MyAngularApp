@@ -1,16 +1,13 @@
-<p *ngIf="!orders"><em>Loading...</em></p>
 <div class="container-fluid">
   <div class="row">
     <div [class.col-md-8]="showDetail">
       <div class='panel panel-primary'>
         <div class='panel-heading'>
           <p>
-            Browse Orders
+            Browse Orders <span *ngIf="!orders" class="flash"><em> Loading...</em></span>
             <button *ngIf="!showDetail" class="btn btn-primary panel-title pull-right" (click)="showNewOrder()">New Order </button>
-            <!--<a class="btn btn-primary panel-title pull-right" [routerLink]="[{ outlets: { detail: ['new-order'] } }]">New Order</a>-->
           </p>
         </div>
-        <!--<div class='panel-body'>-->
         <div class=' table table-responsive'>
           <table class="table" *ngIf="orders">
             <thead>
@@ -37,7 +34,6 @@
             </tbody>
           </table>
         </div>
-        <!--</div>-->
       </div>
       </div>
       <div class="col-md-4" *ngIf="showDetail">

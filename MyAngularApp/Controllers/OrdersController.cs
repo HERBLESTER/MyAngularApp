@@ -135,7 +135,7 @@ namespace MyAngularApp.Controllers
                 street = o.Street
             };
 
-            return CreatedAtAction("GetOrder", new { id = order.id }, order);
+            return CreatedAtAction("NewOrder", new { id = order.id }, order);
         }
 
      

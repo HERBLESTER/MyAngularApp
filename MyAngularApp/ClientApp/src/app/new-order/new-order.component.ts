@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
+import { UtilitiesService } from '../services/utilities.service';
 
 @Component({
   selector: 'app-new-order',
@@ -20,6 +21,7 @@ import { OrderCompositeService } from '../services/order-composite.service';
 })
 export class NewOrderComponent implements OnInit {
   constructor(
+    private utilities: UtilitiesService,
     public orderDataService: OrderDataService,
     public metaDataService: MetaDataService,
     public toastr: ToastrService,
@@ -33,18 +35,20 @@ export class NewOrderComponent implements OnInit {
   metaData: MetaData;
   model: Order;
 
-  parentRoute: string = this.router.url;
-
   onCancel() {
-    this.router.navigate(["/browse-orders"], { relativeTo: this.route });
+    this.router.navigate([this.utilities.getParentRoute(this.router.url)], { relativeTo: this.route });
     this.orderCompositeService.setDetailState(false);
   }
 
   onSubmit() {
     this.submitted = true;
   
-    this.orderDataService.newOrder(this.model);
+    this.orderDataService.newOrder(this.model)
+      .subscribe(result =>
+        this.orderCompositeService.signalNewOrderAdded(result));
+
     this.toastr.success('Order Added!', 'Success!');
+    ;
 
     this.model = new Order();
   }

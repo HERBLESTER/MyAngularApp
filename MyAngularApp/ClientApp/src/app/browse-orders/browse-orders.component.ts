@@ -19,31 +19,43 @@ export class BrowseOrdersComponent implements OnInit {
   constructor(public orderDataService: OrderDataService,
     public orderCompositeService: OrderCompositeService,
     public router: Router)
-  {
-   this.detailStateSubscription = this.orderCompositeService.detailState.
-      subscribe(state =>
-        this.showDetail = state);
-  }
+  {  }
 
   private detailStateSubscription: Subscription;
+  private newOrderAddedSubscription: Subscription;
+
   public detailTitle: string = "New Order"
   public showDetail: boolean = false;
 
 // private newOrderLink: string = '[routerLink] = "[{ outlets: { detail: ['new-order'] } }]"';
   public Status = Status;
-  public orders: Observable<Order[]>;
-  
+  public orderSubscription: Subscription;
+  public orders: Order[];
+  public newOrderAdded: boolean = false;
+
  public showNewOrder() {
    this.showDetail = true;
    this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
   }
 
   ngOnInit() {
-    this.orders = this.orderDataService.getOrders();
+    this.orderSubscription =
+      this.orderDataService.getOrders()
+        .subscribe(result => this.orders = result);
+
+    this.detailStateSubscription = this.orderCompositeService.detailState.
+      subscribe(state =>
+        this.showDetail = state);
+    
+    this.newOrderAddedSubscription =
+      this.orderCompositeService.newOrderSignal
+        .subscribe(order => this.orders.unshift(order));
   }
 
   ngOnDetroy() {
     if (this.detailStateSubscription)
       this.detailStateSubscription.unsubscribe();
+    if (this.orderSubscription)
+      this.orderSubscription.unsubscribe();
   }
 }

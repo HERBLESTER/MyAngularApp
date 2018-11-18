@@ -98,7 +98,7 @@ namespace MyAngularApp.Controllers
         }
 
         // POST: api/Orders
-       
+
         [HttpPost]
         [Route("~/api/Orders/NewOrder")]
         public async Task<IActionResult> NewOrder([FromBody] OrderVM order)
@@ -112,7 +112,7 @@ namespace MyAngularApp.Controllers
             {
                 CityId = order.cityId,
                 CustomerId = order.customerId,
-                DateReceived = order.dateReceived,
+                DateReceived = DateTime.Now,
                 Notes = order.notes,
                 OperationId = order.operationId,
                 Status = Status.Received,
@@ -121,8 +121,21 @@ namespace MyAngularApp.Controllers
 
             _context.Orders.Add(o);
             await _context.SaveChangesAsync();
-       
-            return CreatedAtAction("GetOrder", new { id = o.Id }, o);
+            o = await _context.Orders.Include("Customer").Include("City").Include("Operation").FirstAsync<Order>(oo => oo.Id == o.Id);
+
+            order = new OrderVM
+            {
+                id = o.Id,
+                cityName = o.City.Name,
+                customerName = o.Customer.Name,
+                dateReceived = o.DateReceived,
+                notes = o.Notes,
+                operationName = o.Operation.Name,
+                status = o.Status,
+                street = o.Street
+            };
+
+            return CreatedAtAction("GetOrder", new { id = order.id }, order);
         }
 
      

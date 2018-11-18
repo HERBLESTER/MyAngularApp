@@ -25,7 +25,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of orders | async">
+              <tr *ngFor="let order of orders">
                 <td>{{order.dateReceived | date:'short'}}</td>
                 <td>{{order.customerName}}</td>
                 <td>{{order.cityName}}</td>

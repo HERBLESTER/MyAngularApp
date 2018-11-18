@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { catchError, map, tap, retry } from 'rxjs/operators';
 import { ErrorHandlerService } from '../services/error-handler.service';
 import { error } from 'util';
+import { Subscription } from 'rxjs';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -26,12 +27,9 @@ export class OrderDataService {
   getCustomerOrders() { }
   updateOrder(order: Order) { }
 
-  newOrder(order: Order): void {
-    this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)
-      .pipe(catchError(ErrorHandlerService.handleError))
-      .subscribe(
-        result => result  //todo: add to cache
-      );
+  newOrder(order: Order): Observable<Order> {
+    return this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)
+      .pipe(catchError(ErrorHandlerService.handleError));
   }
 
   getScheduledOrders() { }

@@ -28,18 +28,17 @@ export class BrowseOrdersComponent implements OnInit {
   public detailTitle: string;
   public showDetail: boolean = false;
 
-// private newOrderLink: string = '[routerLink] = "[{ outlets: { detail: ['new-order'] } }]"';
   public Status = Status;
   public orderSubscription: Subscription;
   public orders: Order[];
   public newOrderAdded: boolean = false;
-  public  selectedRow: Number;
+  public selectedRow: Number;
   
   public setClickedRow = function (index) {
   this.selectedRow = index;
 }
 
-  displayOrderForUpdae(orderId: number) {
+  displayOrderForUpdate(orderId: number) {
     this.detailTitle = "Update Order"
 
     this.showDetail = true;
@@ -81,5 +80,7 @@ export class BrowseOrdersComponent implements OnInit {
       this.orderSubscription.unsubscribe();
     if (this.newOrderAddedSubscription)
       this.newOrderAddedSubscription.unsubscribe();
+    if (this.orderUpdatedSubscription)
+      this.orderUpdatedSubscription.unsubscribe();
   }
 }

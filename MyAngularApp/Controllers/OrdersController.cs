@@ -78,28 +78,28 @@ namespace MyAngularApp.Controllers
 
         // PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] OrderVM order)
+        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] OrderVM orderVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != order.id)
+            if (id != orderVM.id)
             {
                 return BadRequest();
             }
 
-            Order o = await _context.Orders.FindAsync(order.id);
-            o.Id = order.id;
-            o.CityId = order.cityId;
-            o.CustomerId = order.customerId;
-            o.Notes = order.notes;
-            o.OperationId = order.operationId;
-            o.Status = order.status;
-            o.Street = order.street;
+            Order order = await _context.Orders.FindAsync(orderVM.id);
+            order.Id = orderVM.id;
+            order.CityId = orderVM.cityId;
+            order.CustomerId = orderVM.customerId;
+            order.Notes = orderVM.notes;
+            order.OperationId = orderVM.operationId;
+            order.Status = orderVM.status;
+            order.Street = orderVM.street;
 
-            _context.Entry(o).State = EntityState.Modified;
+            _context.Entry(order).State = EntityState.Modified;
 
             try
             {
@@ -117,7 +117,28 @@ namespace MyAngularApp.Controllers
                 }
             }
 
-            return NoContent();
+            order = await _context.Orders.Include("Customer").Include("City").Include("Operation").FirstOrDefaultAsync<Order>(oo => oo.Id == order.Id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            orderVM = new OrderVM
+            {
+                id = order.Id,
+                cityId = order.CityId,
+                cityName = order.City.Name,
+                customerId = order.CustomerId,
+                customerName = order.Customer.Name,
+                dateReceived = order.DateReceived,
+                notes = order.Notes,
+                operationId = order.OperationId,
+                operationName = order.Operation.Name,
+                status = order.Status,
+                street = order.Street
+            };
+
+            return Ok(orderVM);
         }
 
         // POST: api/Orders

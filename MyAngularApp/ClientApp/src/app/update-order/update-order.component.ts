@@ -3,6 +3,7 @@ import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
 import { Order } from '../domain/domain';
+import { Status } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -30,7 +31,6 @@ export class UpdateOrderComponent implements OnInit {
   }
 
   submitted = false;
-
   routeParamsSubscription: Subscription;
   metaDataSubscription: Subscription;
   orderSubscription: Subscription;
@@ -58,7 +58,7 @@ export class UpdateOrderComponent implements OnInit {
     this.model.notes = this.updateForm.get('notes').value;
 
     this.orderSubscription = this.orderDataService.updateOrder(this.model)
-      .subscribe(result => this.signalOrderUpdated(this.model));
+      .subscribe(result => this.signalOrderUpdated(result));
   }
 
   signalOrderUpdated(order: Order) {
@@ -75,7 +75,8 @@ export class UpdateOrderComponent implements OnInit {
       city: new FormControl(this.model.cityId, { validators: [Validators.required] }),
       operation: new FormControl(this.model.operationId, { validators: [Validators.required] }),
       street: new FormControl(this.model.street, { validators: [Validators.required, Validators.minLength(4)] }),
-      notes: new FormControl(this.model.notes)
+      notes: new FormControl(this.model.notes),
+      status: new FormControl(Status[this.model.status])
     });
 
     this.updateForm.controls['street'].markAsTouched();

@@ -43,21 +43,35 @@ namespace MyAngularApp.Controllers
         }
 
         // GET: api/Orders/5
-        [HttpGet("{id}")]
-        [Route("~/api/Orders/Customer")]
-        public async Task<IActionResult> GetCustomerOrders([FromRoute] int customerId )
+        [HttpGet("{orderId}")]
+       // [Route("~/api/Orders/{id}")]
+        public async Task<IActionResult> Get(int orderId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var order = await _context.Orders.FindAsync(1);
-
-            if (order == null)
+            Order o = await _context.Orders.Include("Customer").Include("City").Include("Operation").FirstOrDefaultAsync<Order>(oo => oo.Id == orderId);
+            if (o == null)
             {
                 return NotFound();
             }
+
+            OrderVM order = new OrderVM
+            {
+                id = o.Id,
+                cityId = o.CityId,
+                cityName = o.City.Name,
+                customerId = o.CustomerId,
+                customerName = o.Customer.Name,
+                dateReceived = o.DateReceived,
+                notes = o.Notes,
+                operationId = o.OperationId,
+                operationName = o.Operation.Name,
+                status = o.Status,
+                street = o.Street
+            };
 
             return Ok(order);
         }
@@ -121,7 +135,6 @@ namespace MyAngularApp.Controllers
 
             _context.Orders.Add(o);
             await _context.SaveChangesAsync();
-            o = await _context.Orders.Include("Customer").Include("City").Include("Operation").FirstAsync<Order>(oo => oo.Id == o.Id);
 
             order = new OrderVM
             {

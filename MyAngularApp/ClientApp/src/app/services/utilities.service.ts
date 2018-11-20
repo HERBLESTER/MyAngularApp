@@ -8,6 +8,6 @@ export class UtilitiesService {
   constructor() { }
 
   public getParentRoute(route: string): string {
-    return route.split("/").slice(0, -1).join("/");
+    return route.split("(")[0];
   }
 }

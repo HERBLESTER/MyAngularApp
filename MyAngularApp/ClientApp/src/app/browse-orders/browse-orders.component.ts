@@ -24,7 +24,7 @@ export class BrowseOrdersComponent implements OnInit {
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
 
-  public detailTitle: string = "New Order"
+  public detailTitle: string;
   public showDetail: boolean = false;
 
 // private newOrderLink: string = '[routerLink] = "[{ outlets: { detail: ['new-order'] } }]"';
@@ -32,8 +32,21 @@ export class BrowseOrdersComponent implements OnInit {
   public orderSubscription: Subscription;
   public orders: Order[];
   public newOrderAdded: boolean = false;
+  public  selectedRow: Number;
+  
+  public setClickedRow = function (index) {
+  this.selectedRow = index;
+}
 
- public showNewOrder() {
+  updateOrder(orderId: number) {
+    this.detailTitle = "Update Order"
+
+    this.showDetail = true;
+    this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId +')');
+  }
+
+  public showNewOrder() {
+   this.detailTitle = "New Order"
    this.showDetail = true;
    this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
   }

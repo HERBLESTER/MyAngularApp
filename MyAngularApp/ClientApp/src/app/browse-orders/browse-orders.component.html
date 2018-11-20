@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <div class="row">
-    <div [class.col-md-8]="showDetail">
+    <div [ngClass]="{ 'col-md-8': showDetail }" >
       <div class='panel panel-primary'>
         <div class='panel-heading'>
           <p>
@@ -8,7 +8,7 @@
             <button *ngIf="!showDetail" class="btn btn-primary panel-title pull-right" (click)="showNewOrder()">New Order </button>
           </p>
         </div>
-        <div class=' table table-responsive'>
+        <div class=' table table-responsive table-hover'>
           <table class="table" *ngIf="orders">
             <thead>
               <tr>
@@ -22,8 +22,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of orders">
-                <td>{{order.dateReceived | date:'short'}}</td>
+              <tr *ngFor="let order of orders; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
+                <td><a [routerLink]="" (click)="updateOrder(order.id)">{{order.dateReceived | date:'short'}}</a></td>
                 <td>{{order.customerName}}</td>
                 <td>{{order.cityName}}</td>
                 <td>{{order.street}}</td>
@@ -35,18 +35,18 @@
           </table>
         </div>
       </div>
-      </div>
-      <div class="col-md-4" *ngIf="showDetail">
-        <div class='panel panel-primary'>
-          <div class='panel-heading'>
-            <p>{{detailTitle}}</p>
-          </div>
-          <div class='panel-body'>
-            <router-outlet name="detail">
-            </router-outlet>
-          </div>
+    </div>
+    <div [ngClass]="{ 'col-md-4': showDetail }" *ngIf="showDetail">
+      <div class='panel panel-primary'>
+        <div class='panel-heading'>
+          <p>{{detailTitle}}</p>
+        </div>
+        <div class='panel-body'>
+          <router-outlet name="detail">
+          </router-outlet>
         </div>
       </div>
     </div>
   </div>
+</div>
 

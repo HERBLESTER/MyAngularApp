@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -13,6 +13,7 @@ import { BrowseOrdersComponent } from './browse-orders/browse-orders.component';
 import { SearchOrdersComponent } from './search-orders/search-orders.component';
 import { MetaDataService } from './services/meta-data.service';
 import { OrderDataService } from './services/order-data.service';
+import { UpdateOrderComponent } from './update-order/update-order.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { OrderDataService } from './services/order-data.service';
     NewOrderComponent,
     BrowseOrdersComponent,
     SearchOrdersComponent,
+    UpdateOrderComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -28,12 +30,13 @@ import { OrderDataService } from './services/order-data.service';
     ToastrModule.forRoot(),
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       {
         path: 'browse-orders', component: BrowseOrdersComponent,
         children: [
           { path: 'new-order', component: NewOrderComponent, outlet: "detail" },
-          { path: 'update-order/:id', component: NewOrderComponent, outlet: "detail" }]
+          { path: 'update-order/:id', component: UpdateOrderComponent, outlet: "detail" }]
       },
       { path: '', redirectTo: '/browse-orders', pathMatch: 'full'}
     ], { enableTracing: true })

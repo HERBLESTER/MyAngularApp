@@ -24,6 +24,11 @@ export class OrderDataService {
       catchError(ErrorHandlerService.handleError));
   }
 
+  getOrder(id: number): Observable<Order> {
+    return this.http.get<Order>(this.baseUrl + 'api/Orders/' + id)
+      .pipe(catchError(ErrorHandlerService.handleError));
+  }
+
   getCustomerOrders() { }
   updateOrder(order: Order) { }
 

@@ -58,7 +58,7 @@ export class NewOrderComponent implements OnInit, ComponentCanDeactivate {
   model: Order;
 
   onCancel() {
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)], { relativeTo: this.route });
+    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
     this.orderCompositeService.setDetailState(false);
   }
 

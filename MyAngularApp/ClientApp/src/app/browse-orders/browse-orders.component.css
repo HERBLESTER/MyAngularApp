@@ -16,3 +16,8 @@
     color: black;
   }
 }
+.table tr.active td {
+  background-color: #337ab7 !important;
+  color: white;
+}
+

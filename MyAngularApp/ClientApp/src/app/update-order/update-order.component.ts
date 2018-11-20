@@ -37,28 +37,35 @@ export class UpdateOrderComponent implements OnInit {
 
   metaData: MetaData;
   model: Order = new Order();
-
   updateForm: FormGroup;
+  isValid: boolean;
 
   get street() {
-    return this.updateForm.get('street');
+    return this.updateForm.get('street').value;
   }
 
   onCancel() {
     this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
-    this.orderCompositeService.setDetailState(false);
+    this.orderCompositeService.setDetailState(false);//todo: use router listen
   }
 
-  onSubmit(form: NgForm) {
+  onSubmit() {
     this.submitted = true;
+    this.model.cityId = this.updateForm.get('city').value;
+    this.model.customerId = this.updateForm.get('customer').value;
+    this.model.operationId = this.updateForm.get('operation').value;
+    this.model.street = this.street;
+    this.model.notes = this.updateForm.get('notes').value;
 
-    this.orderSubscription = this.orderDataService.newOrder(this.model)
-      .subscribe(result =>
-        this.orderCompositeService.signalNewOrderAdded(result));
+    this.orderSubscription = this.orderDataService.updateOrder(this.model)
+      .subscribe(result => this.signalOrderUpdated(this.model));
+  }
 
+  signalOrderUpdated(order: Order) {
+    this.orderCompositeService.signalOrderUpdated(order)
+    this.orderCompositeService.setDetailState(false);
     this.toastr.success('Order Updated!', 'Success!');
-
-    this.model = new Order();
+    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
   }
 
   setupForm(order: Order) {
@@ -67,9 +74,13 @@ export class UpdateOrderComponent implements OnInit {
       customer: new FormControl(this.model.customerId, { validators: [Validators.required] }),
       city: new FormControl(this.model.cityId, { validators: [Validators.required] }),
       operation: new FormControl(this.model.operationId, { validators: [Validators.required] }),
-      street: new FormControl(this.model.street, { updateOn: 'blur', validators: [Validators.required, Validators.minLength(4)] }),
+      street: new FormControl(this.model.street, { validators: [Validators.required, Validators.minLength(4)] }),
       notes: new FormControl(this.model.notes)
     });
+
+    this.updateForm.controls['street'].markAsTouched();
+    this.updateForm.controls['street'].updateValueAndValidity();
+    this.isValid = this.updateForm.valid;
   }
 
   ngOnInit() {

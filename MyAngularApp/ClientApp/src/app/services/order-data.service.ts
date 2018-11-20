@@ -29,8 +29,10 @@ export class OrderDataService {
       .pipe(catchError(ErrorHandlerService.handleError));
   }
 
-  getCustomerOrders() { }
-  updateOrder(order: Order) { }
+  updateOrder(order: Order): Observable<Order>  {
+    return this.http.put<Order>(this.baseUrl + 'api/Orders/' + order.id, order, httpOptions)
+      .pipe(catchError(ErrorHandlerService.handleError));
+  }
 
   newOrder(order: Order): Observable<Order> {
     return this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)

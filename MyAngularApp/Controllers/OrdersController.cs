@@ -78,19 +78,28 @@ namespace MyAngularApp.Controllers
 
         // PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] Order order)
+        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] OrderVM order)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != order.Id)
+            if (id != order.id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(order).State = EntityState.Modified;
+            Order o = await _context.Orders.FindAsync(order.id);
+            o.Id = order.id;
+            o.CityId = order.cityId;
+            o.CustomerId = order.customerId;
+            o.Notes = order.notes;
+            o.OperationId = order.operationId;
+            o.Status = order.status;
+            o.Street = order.street;
+
+            _context.Entry(o).State = EntityState.Modified;
 
             try
             {

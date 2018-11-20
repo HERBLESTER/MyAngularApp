@@ -23,6 +23,7 @@ export class BrowseOrdersComponent implements OnInit {
 
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
+  private orderUpdatedSubscription: Subscription;
 
   public detailTitle: string;
   public showDetail: boolean = false;
@@ -38,7 +39,7 @@ export class BrowseOrdersComponent implements OnInit {
   this.selectedRow = index;
 }
 
-  updateOrder(orderId: number) {
+  displayOrderForUpdae(orderId: number) {
     this.detailTitle = "Update Order"
 
     this.showDetail = true;
@@ -63,6 +64,14 @@ export class BrowseOrdersComponent implements OnInit {
     this.newOrderAddedSubscription =
       this.orderCompositeService.newOrderSignal
         .subscribe(order => this.orders.unshift(order));
+
+    this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
+  }
+
+  updateOrder(order: Order) {
+    const index: number = this.orders.findIndex(o => o.id === order.id);
+    if (index !== -1)
+      this.orders.splice(index, 1, order);
   }
 
   ngOnDetroy() {

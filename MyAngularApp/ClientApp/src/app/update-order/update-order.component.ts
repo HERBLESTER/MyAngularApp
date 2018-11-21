@@ -31,17 +31,27 @@ export class UpdateOrderComponent implements OnInit {
   }
 
   submitted = false;
-  routeParamsSubscription: Subscription;
+
   metaDataSubscription: Subscription;
   orderSubscription: Subscription;
+  orderSelectedSubscription: Subscription;
 
   metaData: MetaData;
-  model: Order = new Order();
+  model: Order;
   updateForm: FormGroup;
   isValid: boolean;
 
   get street() {
     return this.updateForm.get('street').value;
+  }
+  
+  isCanceled(): boolean {
+    return this.model && this.model.status && this.model.status === Status.Cancelled;
+  }
+ 
+  cancelOrder() {
+    this.model.status = Status.Cancelled;
+    this.updateForm.get('status').setValue(Status[this.model.status]);
   }
 
   onCancel() {
@@ -58,7 +68,7 @@ export class UpdateOrderComponent implements OnInit {
     this.model.notes = this.updateForm.get('notes').value;
 
     this.orderSubscription = this.orderDataService.updateOrder(this.model)
-      .subscribe(result => this.signalOrderUpdated(result));
+      .subscribe(result => this.signalOrderUpdated(result), err => this.toastr.error('Order Update Failed!', err));
   }
 
   signalOrderUpdated(order: Order) {
@@ -85,23 +95,29 @@ export class UpdateOrderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.orderDataService.getOrder(this.route.snapshot.params['id'])
-      .subscribe(result => this.setupForm(result));
-    
-    //this.routeParamsSubscription = this.route.params.subscribe(
-    //  (params: any) => {
-    //    this.orderDataService.getOrder(params['id']).subscribe(result => this.model = result);
-    //  });
 
-    this.metaDataSubscription = this.metaDataService.metaData.subscribe(result => this.metaData = result);
+    const id: number = this.route.snapshot.params['id'];
+    if (!this.model || !this.model.id || this.model.id !== id) {
+      this.orderDataService.getOrder(this.route.snapshot.params['id'])
+        .subscribe(result => this.setupForm(result), err => this.toastr.error('Order Fetch Failed!', err));
+    }
+    
+    this.orderSelectedSubscription = this.orderCompositeService.selectedOrderSignal
+      .subscribe(order => this.orderDataService.getOrder(order.id)
+        .subscribe(result => this.setupForm(result)), err => this.toastr.error('Order Fetch Failed!', err));
+
+    this.metaDataSubscription =
+      this.metaDataService.metaData.subscribe(
+      result => this.metaData = result,
+      err => this.toastr.error('Metadata fetch Failed!', err));
   }
 
   ngOnDestroy() {
     if (this.metaDataSubscription) {
       this.metaDataSubscription.unsubscribe();
     }
-    if (this.routeParamsSubscription) {
-      this.routeParamsSubscription.unsubscribe();
+    if (this.orderSelectedSubscription) {
+      this.orderSelectedSubscription.unsubscribe();
     }
     if (this.orderSubscription) {
       this.orderSubscription.unsubscribe();

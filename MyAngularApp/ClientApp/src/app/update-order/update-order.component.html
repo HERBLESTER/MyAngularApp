@@ -1,48 +1,59 @@
-
-<form (ngSubmit)="onSubmit()" [formGroup]="updateForm" *ngIf="updateForm && metaData">
-  <div class="form-group">
-    <label for="customer">Customer</label>
-    <select class="form-control" id="customer" required formControlName="customer">
-      <option *ngFor="let customer of metaData.customers" [value]="customer.id">{{customer.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="city">City</label>
-    <select class="form-control" id="city" required formControlName="city">
-      <option *ngFor="let city of metaData.cities" [value]="city.id">{{city.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="operation">Operation</label>
-    <select class="form-control" id="operation" required formControlName="operation">
-      <option *ngFor="let operation of metaData.operations" [value]="operation.id">{{operation.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="street">Street</label>
-    <input type="text" class="form-control" id="street" required formControlName="street" />
-    <div *ngIf="street.invalid && (street.dirty || street.touched)"
-         class="alert alert-danger">
-      <div *ngIf="street.errors.required">
-        Street is required.
-      </div>
-      <div *ngIf="street.errors.minlength">
-        Street must be at least 4 characters long.
-      </div>
+<div class="col-md-4">
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <p>
+        Update Order
+        <button class="btn btn-primary btn-xs panel-title pull-right" [disabled]="isCanceled()" (click)="cancelOrder()">Cancel Order</button>
+      </p>
+    </div>
+    <div class='panel-body'>
+      <form (ngSubmit)="onSubmit()" [formGroup]="updateForm" *ngIf="updateForm && metaData">
+        <div class="form-group">
+          <label for="customer">Customer</label>
+          <select class="form-control" id="customer" required formControlName="customer">
+            <option *ngFor="let customer of metaData.customers" [value]="customer.id">{{customer.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <select class="form-control" id="city" required formControlName="city">
+            <option *ngFor="let city of metaData.cities" [value]="city.id">{{city.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="operation">Operation</label>
+          <select class="form-control" id="operation" required formControlName="operation">
+            <option *ngFor="let operation of metaData.operations" [value]="operation.id">{{operation.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="street">Street</label>
+          <input type="text" class="form-control" id="street" required formControlName="street" />
+          <div *ngIf="street.invalid && (street.dirty || street.touched)"
+               class="alert alert-danger">
+            <div *ngIf="street.errors.required">
+              Street is required.
+            </div>
+            <div *ngIf="street.errors.minlength">
+              Street must be at least 4 characters long.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <input type="text" class="form-control" id="notes" formControlName="notes">
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <input type="text" class="form-control" id="status" formControlName="status" [readonly]="true" />
+        </div>
+        <div class="btn-toolbar">
+          <div class="btn-group btn-group-justified" role="group">
+            <button type="submit" class="btn btn-success" [disabled]="!isValid">Submit</button>
+            <button type="button" class="btn btn-default" (click)="onCancel($event)">Cancel</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
-  <div class="form-group">
-    <label for="notes">Notes</label>
-    <input type="text" class="form-control" id="notes" formControlName="notes">
-  </div>
-  <div class="form-group">
-    <label for="status">Status</label>
-    <input type="text" class="form-control" id="status" formControlName="status" [readonly]="true" />
-  </div>
-  <div class="btn-toolbar">
-    <div class="btn-group btn-group-justified" role="group">
-      <button type="submit" class="btn btn-success" [disabled]="!isValid">Submit</button>
-      <button type="button" class="btn btn-default" (click)="onCancel($event)">Cancel</button>
-    </div>
-  </div>
-</form>
+</div>

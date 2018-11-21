@@ -1,35 +1,44 @@
 
-<form #orderForm="ngForm" (ngSubmit)="onSubmit()" *ngIf="metaData">
-  <div class="form-group">
-    <label for="customer">Customer</label>
-    <select class="form-control" id="customer" required [(ngModel)]="model.customerId" name="customer">
-      <option *ngFor="let customer of metaData.customers" [value]="customer.id">{{customer.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="city">City</label>
-    <select class="form-control" id="city" required [(ngModel)]="model.cityId" name="city">
-      <option *ngFor="let city of metaData.cities" [value]="city.id">{{city.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="operation">Operation</label>
-    <select class="form-control" id="operation" required [(ngModel)]="model.operationId" name="operation">
-      <option *ngFor="let operation of metaData.operations" [value]="operation.id">{{operation.name}}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="street">Street</label>
-    <input type="text" class="form-control" id="street" required [(ngModel)]="model.street" name="street" #name="ngModel" />
-  </div>
-  <div class="form-group">
-    <label for="notes">Notes</label>
-    <input type="text" class="form-control" id="notes" [(ngModel)]="model.notes" name="notes">
-  </div>
-    <div class="btn-toolbar">
-      <div class="btn-group btn-group-justified" role="group">
-        <button type="submit" class="btn btn-success" [disabled]="!orderForm.form.valid">Submit</button>
-        <button type="button" class="btn btn-default" (click)="onCancel($event)">Close</button>
-      </div>
+<div class="col-md-4">
+  <div class='panel panel-primary'>
+    <div class='panel-heading'>
+      <p>New Order</p>
     </div>
-</form>
+    <div class='panel-body'>
+      <form #orderForm="ngForm" (ngSubmit)="onSubmit()" *ngIf="metaData">
+        <div class="form-group">
+          <label for="customer">Customer</label>
+          <select class="form-control" id="customer" required [(ngModel)]="model.customerId" name="customer">
+            <option *ngFor="let customer of metaData.customers" [value]="customer.id">{{customer.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <select class="form-control" id="city" required [(ngModel)]="model.cityId" name="city">
+            <option *ngFor="let city of metaData.cities" [value]="city.id">{{city.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="operation">Operation</label>
+          <select class="form-control" id="operation" required [(ngModel)]="model.operationId" name="operation">
+            <option *ngFor="let operation of metaData.operations" [value]="operation.id">{{operation.name}}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="street">Street</label>
+          <input type="text" class="form-control" id="street" required [(ngModel)]="model.street" name="street" #name="ngModel" />
+        </div>
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <input type="text" class="form-control" id="notes" [(ngModel)]="model.notes" name="notes">
+        </div>
+        <div class="btn-toolbar">
+          <div class="btn-group btn-group-justified" role="group">
+            <button type="submit" class="btn btn-success" [disabled]="!orderForm.form.valid">Submit</button>
+            <button type="button" class="btn btn-default" (click)="onCancel($event)">Close</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

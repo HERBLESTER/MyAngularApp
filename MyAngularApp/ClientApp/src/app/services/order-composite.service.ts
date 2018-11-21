@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Order } from '../domain/domain';
-import { CompletedOrder } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
-import { catchError, map, tap, retry } from 'rxjs/operators';
-import { ErrorHandlerService } from '../services/error-handler.service';
 import { Observer, BehaviorSubject } from 'rxjs';
 
 @Injectable()
@@ -19,6 +16,9 @@ export class OrderCompositeService {
   private updatedOrder: Observer<Order>;
   public updatedOrderSignal: Observable<Order> = new Observable(observer => this.updatedOrder = observer);
 
+  private selectedOrder: Observer<Order>;
+  public selectedOrderSignal: Observable<Order> = new Observable(observer => this.selectedOrder = observer);
+
   setDetailState(state: boolean) {
     this.detailIsOpen.next(state);
   }
@@ -29,5 +29,9 @@ export class OrderCompositeService {
 
   signalOrderUpdated(order: Order) {
     this.updatedOrder.next(order);
+  }
+
+  signalOrderSelected(order: Order) {
+    this.selectedOrder.next(order);
   }
 }

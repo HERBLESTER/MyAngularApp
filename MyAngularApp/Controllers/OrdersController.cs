@@ -145,40 +145,46 @@ namespace MyAngularApp.Controllers
 
         [HttpPost]
         [Route("~/api/Orders/NewOrder")]
-        public async Task<IActionResult> NewOrder([FromBody] OrderVM order)
+        public async Task<IActionResult> NewOrder([FromBody] OrderVM orderVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            Order o = new Order
+            Order order = new Order
             {
-                CityId = order.cityId,
-                CustomerId = order.customerId,
+                CityId = orderVM.cityId,
+                CustomerId = orderVM.customerId,
                 DateReceived = DateTime.Now,
-                Notes = order.notes,
-                OperationId = order.operationId,
+                Notes = orderVM.notes,
+                OperationId = orderVM.operationId,
                 Status = Status.Received,
-                Street = order.street
+                Street = orderVM.street
             };
 
-            _context.Orders.Add(o);
+            _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            order = new OrderVM
+            order = await _context.Orders.Include("Customer").Include("City").Include("Operation").FirstOrDefaultAsync<Order>(oo => oo.Id == order.Id);
+            if (order == null)
             {
-                id = o.Id,
-                cityName = o.City.Name,
-                customerName = o.Customer.Name,
-                dateReceived = o.DateReceived,
-                notes = o.Notes,
-                operationName = o.Operation.Name,
-                status = o.Status,
-                street = o.Street
+                return NotFound();
+            }
+
+            orderVM = new OrderVM
+            {
+                id = order.Id,
+                cityName = order.City.Name,
+                customerName = order.Customer.Name,
+                dateReceived = order.DateReceived,
+                notes = order.Notes,
+                operationName = order.Operation.Name,
+                status = order.Status,
+                street = order.Street
             };
 
-            return CreatedAtAction("NewOrder", new { id = order.id }, order);
+            return CreatedAtAction("NewOrder", new { id = orderVM.id }, orderVM);
         }
 
      

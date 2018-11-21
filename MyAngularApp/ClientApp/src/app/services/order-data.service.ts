@@ -37,6 +37,7 @@ export class OrderDataService {
   newOrder(order: Order): Observable<Order> {
     return this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)
       .pipe(catchError(ErrorHandlerService.handleError));
+      
   }
 
   getScheduledOrders() { }

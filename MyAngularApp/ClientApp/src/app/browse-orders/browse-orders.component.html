@@ -5,7 +5,8 @@
         <div class='panel-heading'>
           <p>
             Browse Orders <span *ngIf="!orders" class="flash"><em> Loading...</em></span>
-            <button *ngIf="!showDetail" class="btn btn-primary panel-title pull-right" (click)="showNewOrder()">New Order </button>
+            <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
+            <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
           </p>
         </div>
         <div class="table-responsive">
@@ -23,8 +24,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of orders; let i = index" (click)="setClickedRow(i)" [class.active]="i == selectedRow">
-                <td><a [routerLink]="" (click)="!showDetail && displayOrderForUpdate(order.id)" [class.disabled]="showDetail">{{order.id}}</a></td>
+              <tr *ngFor="let order of orders; let i = index" (click)="setClickedRow(i, order.id)" [class.active]="i == selectedRow">
+                <td>{{order.id}}</td>
                 <td>{{order.dateReceived | date:'short'}}</td>
                 <td>{{order.customerName}}</td>
                 <td>{{order.cityName}}</td>
@@ -38,17 +39,8 @@
         </div>
       </div>
     </div>
-    <div [ngClass]="{ 'col-md-4': showDetail }" *ngIf="showDetail">
-      <div class='panel panel-primary'>
-        <div class='panel-heading'>
-          <p>{{detailTitle}}</p>
-        </div>
-        <div class='panel-body'>
-          <router-outlet name="detail">
-          </router-outlet>
-        </div>
-      </div>
-    </div>
+    <router-outlet name="detail" *ngIf="showDetail">
+    </router-outlet>
   </div>
 </div>
 

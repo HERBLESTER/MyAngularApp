@@ -7,6 +7,8 @@ import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { OrderCompositeService } from '../services/order-composite.service';
 import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { UtilitiesService } from '../services/utilities.service';
 
 @Component({
   selector: 'app-browse-orders',
@@ -18,6 +20,8 @@ export class BrowseOrdersComponent implements OnInit {
 
   constructor(public orderDataService: OrderDataService,
     public orderCompositeService: OrderCompositeService,
+    public toastr: ToastrService,
+    private utilities: UtilitiesService,
     public router: Router)
   {  }
 
@@ -25,7 +29,6 @@ export class BrowseOrdersComponent implements OnInit {
   private newOrderAddedSubscription: Subscription;
   private orderUpdatedSubscription: Subscription;
 
-  public detailTitle: string;
   public showDetail: boolean = false;
 
   public Status = Status;
@@ -33,32 +36,50 @@ export class BrowseOrdersComponent implements OnInit {
   public orders: Order[];
   public newOrderAdded: boolean = false;
   public selectedRow: Number;
-  
-  public setClickedRow = function (index) {
-  this.selectedRow = index;
-}
 
-  displayOrderForUpdate(orderId: number) {
-    this.detailTitle = "Update Order"
+  schedulOrders() {
 
+  }
+
+  public setClickedRow(index: number, orderId: number) {
+    this.selectedRow = index;
     this.showDetail = true;
-    this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId +')');
+    if (this.router.url.indexOf('update-order') !== -1) {
+      this.orderCompositeService.signalOrderSelected(this.orders[index]);
+    }
+    else {
+      if (this.router.url.indexOf('detail') !== -1) {
+        this.router.navigate([this.utilities.getParentRoute(this.router.url)])
+          .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')'));
+      }
+      else {
+        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')');
+      }
+    }
   }
 
   public showNewOrder() {
-   this.detailTitle = "New Order"
-   this.showDetail = true;
-   this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
+    this.showDetail = true;
+    if (this.router.url.indexOf('detail') !== -1) {
+      this.router.navigate([this.utilities.getParentRoute(this.router.url)])
+        .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
+    }
+    else {
+      this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
+    }
+  }
+
+  private setDetailClosed() {
+    this.showDetail = false;
   }
 
   ngOnInit() {
     this.orderSubscription =
       this.orderDataService.getOrders()
-        .subscribe(result => this.orders = result);
+      .subscribe(result => this.orders = result, err => this.toastr.error('Could not Retrieve Orders!', err));
 
     this.detailStateSubscription = this.orderCompositeService.detailState.
-      subscribe(state =>
-        this.showDetail = state);
+      subscribe(state => this.setDetailClosed());
     
     this.newOrderAddedSubscription =
       this.orderCompositeService.newOrderSignal

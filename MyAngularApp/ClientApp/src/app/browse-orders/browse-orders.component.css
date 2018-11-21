@@ -17,12 +17,17 @@
   }
 }
 .table tr.active td {
-  background-color: #337ab7 !important;
+  background-color: lightgray !important;
   color: white;
 }
 
-a.disabled {
+/*a.disabled {
   color: gray;
   cursor: not-allowed;
   text-decoration: underline;
+}*/
+
+button {
+  margin-left: 10px;
+  margin-right: 10px;
 }

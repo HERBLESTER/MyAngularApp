@@ -14,6 +14,7 @@ import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
 import { UtilitiesService } from '../services/utilities.service';
 import { NgForm } from '@angular/forms';
+import { catchError } from 'rxjs/operators';
 
 export interface ComponentCanDeactivate {
   canDeactivate: () => boolean | Observable<boolean>;
@@ -52,6 +53,7 @@ export class NewOrderComponent implements OnInit, ComponentCanDeactivate {
   }
 
   submitted = false;
+  error: any;
 
   subscription: Subscription;
   metaData: MetaData;
@@ -64,11 +66,14 @@ export class NewOrderComponent implements OnInit, ComponentCanDeactivate {
 
   onSubmit(form: NgForm) {
     this.submitted = true;
-  
     this.orderDataService.newOrder(this.model)
-      .subscribe(result =>
-        this.orderCompositeService.signalNewOrderAdded(result));
+       // .pipe(catchError(err => this.error = err))
+        .subscribe(result =>
+        this.processNewOrder(result), err => this.toastr.error('Order Creation Failed!', err));
+  }
 
+  processNewOrder(order: Order) {
+    this.orderCompositeService.signalNewOrderAdded(order);
     this.toastr.success('Order Added!', 'Success!');
 
     this.model = new Order();

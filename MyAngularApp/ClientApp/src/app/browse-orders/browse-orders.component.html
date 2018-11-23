@@ -39,8 +39,10 @@
         </div>
       </div>
     </div>
-    <router-outlet name="detail" *ngIf="showDetail">
-    </router-outlet>
+    <div *ngIf="showDetail" class="col-md-4">
+      <router-outlet name="detail">
+      </router-outlet>
+    </div>
   </div>
 </div>
 

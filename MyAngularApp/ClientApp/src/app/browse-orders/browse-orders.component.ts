@@ -65,7 +65,7 @@ export class BrowseOrdersComponent implements OnInit {
         .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
     }
     else {
-      this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
+      this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
     }
   }
 

@@ -22,8 +22,7 @@ export class BrowseOrdersComponent implements OnInit {
     public orderCompositeService: OrderCompositeService,
     public toastr: ToastrService,
     private utilities: UtilitiesService,
-    public router: Router)
-  {  }
+    public router: Router) { }
 
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
@@ -73,10 +72,28 @@ export class BrowseOrdersComponent implements OnInit {
     this.showDetail = false;
   }
 
-  ngOnInit() {
+  orderCount = 0;
+  currentPage = 1;
+  maxSize: number = 0;
+  pageChanged(event: any): void {
+    this.fetchPage(event.page);
+  }
+
+  fetchPage(page: number) {
     this.orderSubscription =
-      this.orderDataService.getOrders()
-      .subscribe(result => this.orders = result, err => this.toastr.error('Could not Retrieve Orders!', err));
+      this.orderDataService.getPagedOrders(page)
+      .subscribe(result => this.setPagedOrders(page, result), err => this.toastr.error('Could not Retrieve Orders!', err));
+  }
+
+  setPagedOrders(page: number, orders: Order[]) {
+    this.currentPage = page;
+    this.orders = orders;
+    this.orderCount = orders[0].orderCount;
+    this.maxSize = Math.floor(this.orderCount / 10);
+  }
+
+  ngOnInit() {
+    this.fetchPage(1);
 
     this.detailStateSubscription = this.orderCompositeService.detailState.
       subscribe(state => this.setDetailClosed());

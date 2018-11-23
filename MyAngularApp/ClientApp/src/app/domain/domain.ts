@@ -33,6 +33,7 @@ export class Order {
   public operationName: string;
   public notes: string;
   public status: Status = Status.Received;
+  public orderCount: number;
 }
 
 export class CompletedOrder {

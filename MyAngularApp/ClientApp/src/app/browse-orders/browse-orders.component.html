@@ -1,16 +1,23 @@
 <div class="container-fluid">
   <div class="row">
-    <div [ngClass]="{ 'col-md-8': showDetail }" >
+    <div [ngClass]="{ 'col-md-8': showDetail }">
       <div class='panel panel-primary'>
         <div class='panel-heading'>
           <p>
-            Browse Orders <span *ngIf="!orders" class="flash"><em> Loading...</em></span>
+            Browse Orders: <span *ngIf="!orders" class="flash"><em> Loading...</em></span>
             <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
             <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
           </p>
+          <div class="panel-title">
+            <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
+                        (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"
+                        previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
+
+            </pagination>
+          </div>
         </div>
         <div class="table-responsive">
-          <table class="table" *ngIf="orders">
+          <table class="table table-striped" *ngIf="orders">
             <thead>
               <tr>
                 <th>Id</th>
@@ -43,6 +50,7 @@
       <router-outlet name="detail">
       </router-outlet>
     </div>
+    
   </div>
 </div>
 

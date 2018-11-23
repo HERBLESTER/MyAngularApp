@@ -42,6 +42,31 @@ namespace MyAngularApp.Controllers
             return Ok(orders);
         }
 
+        // GET: api/Orders
+        [Route("~/api/Orders/GetPagedorders")]
+        [HttpGet]
+        public async Task<IActionResult> GetPagedOrders([FromQuery(Name = "page")]int pageNumber)
+        {
+            int orderCount = await _context.Orders.CountAsync();
+
+            IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
+                .Select(o => new OrderVM
+                {
+                    id = o.Id,
+                    cityName = o.City.Name,
+                    customerName = o.Customer.Name,
+                    dateReceived = o.DateReceived,
+                    notes = o.Notes,
+                    operationName = o.Operation.Name,
+                    status = o.Status,
+                    street = o.Street,
+                    orderCount = orderCount
+                }).OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10);
+
+            IEnumerable<OrderVM> orders = await orderVMs.ToListAsync();
+
+            return Ok(orders);
+        }
         // GET: api/Orders/5
         [HttpGet("{orderId}")]
        // [Route("~/api/Orders/{id}")]
@@ -267,6 +292,7 @@ namespace MyAngularApp.Controllers
             public string operationName;
             public string notes;
             public Status status;
+            public int orderCount;
         }
         // DELETE: api/Orders/5
         // [HttpDelete("{id}")]

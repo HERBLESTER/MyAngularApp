@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Order } from '../domain/domain';
 import { CompletedOrder } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
@@ -22,6 +22,16 @@ export class OrderDataService {
       .pipe(
       retry(3), // retry a failed request up to 3 times
       catchError(ErrorHandlerService.handleError));
+  }
+
+  getPagedOrders(pageNumber: number): Observable<Order[]> {
+    const params = new HttpParams()
+      .set('page', pageNumber.toString());
+
+    return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetPagedOrders', { params })
+      .pipe(
+        retry(3), // retry a failed request up to 3 times
+        catchError(ErrorHandlerService.handleError));
   }
 
   getOrder(id: number): Observable<Order> {

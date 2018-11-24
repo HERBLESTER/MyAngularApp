@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyAngularApp.Domain;
+using MyAngularApp.Services;
 
 namespace MyAngularApp.Controllers
 {
@@ -14,13 +17,14 @@ namespace MyAngularApp.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly Context _context;
+        OrderSchedulingService _scheduleService;
 
-        public OrdersController(Context context)
+        public OrdersController(Context context, OrderSchedulingService scheduleService)
         {
             _context = context;
+            _scheduleService = scheduleService;
         }
 
-        // GET: api/Orders
         [Route("~/api/Orders/Getallorders")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
@@ -42,7 +46,6 @@ namespace MyAngularApp.Controllers
             return Ok(orders);
         }
 
-        // GET: api/Orders
         [Route("~/api/Orders/GetPagedorders")]
         [HttpGet]
         public async Task<IActionResult> GetPagedOrders([FromQuery(Name = "page")]int pageNumber)
@@ -67,9 +70,8 @@ namespace MyAngularApp.Controllers
 
             return Ok(orders);
         }
-        // GET: api/Orders/5
+
         [HttpGet("{orderId}")]
-       // [Route("~/api/Orders/{id}")]
         public async Task<IActionResult> Get(int orderId)
         {
             if (!ModelState.IsValid)
@@ -166,8 +168,6 @@ namespace MyAngularApp.Controllers
             return Ok(orderVM);
         }
 
-        // POST: api/Orders
-
         [HttpPost]
         [Route("~/api/Orders/NewOrder")]
         public async Task<IActionResult> NewOrder([FromBody] OrderVM orderVM)
@@ -209,67 +209,36 @@ namespace MyAngularApp.Controllers
                 street = order.Street
             };
 
-            return CreatedAtAction("NewOrder", new { id = orderVM.id }, orderVM);
+            return CreatedAtAction("NewOrder", new { orderVM.id }, orderVM);
         }
 
-     
-        // GET: api/Orders/5
-        [Route("~/api/Orders/scheduled")]
-        [HttpGet]
-        public async Task<IActionResult> GetScheduledOrders()
+        [HttpPost]
+        [Route("~/api/Orders/ScheduleOrders")]
+        public async Task<IActionResult> ScheduleOrders()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var order = await _context.Orders.FindAsync(1);
+            int count = 0;
 
-            if (order == null)
+            try
             {
-                return NotFound();
+                count = await _scheduleService.ScheduleOrders.Schedule();
+            }
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
-            return Ok(order);
+            return Ok( count );
         }
 
-        //[Route("~/api/Orders/Completed")]
-        //[HttpPost]
-        //public async Task<IActionResult> GetCompletedOrders([FromRoute] DateTime begin, [FromRoute] DateTime end)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    var order = await _context.Orders.FindAsync(1);
-
-        //    if (order == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(order);
-        //}
-
-        //[Route("~/api/Orders/Complete")]
-        //[HttpPost]
-        //public async Task<IActionResult> CompleteOrder([FromBody] CompletedOrder completed)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //   var order = await _context.Orders.FindAsync(completed.OrderId);
-
-        //    if (order == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(order);
-        //}
+        public class ScheduledResult
+        {
+            public int count;
+        }
 
         public class CompletedOrderVM
         {

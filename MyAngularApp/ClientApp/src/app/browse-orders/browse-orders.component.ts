@@ -27,6 +27,7 @@ export class BrowseOrdersComponent implements OnInit {
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
   private orderUpdatedSubscription: Subscription;
+  private scheduleOrdersSubscription: Subscription;
 
   public showDetail: boolean = false;
 
@@ -35,9 +36,22 @@ export class BrowseOrdersComponent implements OnInit {
   public orders: Order[];
   public newOrderAdded: boolean = false;
   public selectedRow: Number;
+  public loading = false;
 
-  schedulOrders() {
+  scheduleOrders() {
+    this.loading = true;
 
+    this.scheduleOrdersSubscription =
+      this.orderDataService.scheduledOrders()
+      .subscribe(result => {
+        this.loading = false;
+        this.toastr.success(`Scheduled ${result} Orders!`);
+      },
+      err => {
+        this.toastr.error('Schedule Orders Failed! A Partial Update may have occurred', err);
+        this.loading = false;
+      }
+    );
   }
 
   public setClickedRow(index: number, orderId: number) {
@@ -120,5 +134,7 @@ export class BrowseOrdersComponent implements OnInit {
       this.newOrderAddedSubscription.unsubscribe();
     if (this.orderUpdatedSubscription)
       this.orderUpdatedSubscription.unsubscribe();
+    if (this.scheduleOrdersSubscription)
+      this.scheduleOrdersSubscription.unsubscribe();
   }
 }

@@ -47,10 +47,13 @@ export class OrderDataService {
   newOrder(order: Order): Observable<Order> {
     return this.http.post<Order>(this.baseUrl + 'api/Orders/NewOrder', order, httpOptions)
       .pipe(catchError(ErrorHandlerService.handleError));
-      
   }
 
-  getScheduledOrders() { }
+  scheduledOrders(): Observable<number> {
+    return this.http.post<number>(this.baseUrl + 'api/Orders/ScheduleOrders', null, httpOptions)
+      .pipe(catchError(ErrorHandlerService.handleError));
+  }
+
   getCompletedOrders(begin: Date, end: Date) { }
   completeOrder(completedOrder: CompletedOrder) { }
 }

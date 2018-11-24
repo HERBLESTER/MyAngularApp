@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ToastrModule } from 'ngx-toastr';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { NgxLoadingModule } from 'ngx-loading';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -31,6 +32,7 @@ import { UpdateOrderComponent } from './update-order/update-order.component';
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     PaginationModule.forRoot(),
+    NgxLoadingModule.forRoot({}),
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,

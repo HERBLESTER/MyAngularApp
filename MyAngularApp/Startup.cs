@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyAngularApp.Domain;
 using Microsoft.EntityFrameworkCore;
+using MyAngularApp.Services;
+using MyAngularApp.Business;
 
 namespace MyAngularApp
 {
@@ -33,8 +35,8 @@ namespace MyAngularApp
             var connection = @"Server=(localdb)\mssqllocaldb;Database=MyAngulrAppStorage;Trusted_Connection=True;ConnectRetryCount=0";
             services.AddDbContext<Context>
                 (options => options.UseSqlServer(connection));
-
-
+            services.AddTransient<OrderSchedulingService>();
+            services.AddTransient<IScheduleOrders, ScheduleOrders>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

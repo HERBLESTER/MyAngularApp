@@ -12,10 +12,10 @@
             <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
                         (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"
                         previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
-
             </pagination>
           </div>
         </div>
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate"></ngx-loading>
         <div class="table-responsive">
           <table class="table table-striped table-condensed table-hover" *ngIf="orders">
             <thead>

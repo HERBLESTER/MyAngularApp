@@ -17,17 +17,17 @@
           </div>
         </div>
         <div class="table-responsive">
-          <table class="table table-striped" *ngIf="orders">
+          <table class="table table-striped table-condensed table-hover" *ngIf="orders">
             <thead>
               <tr>
-                <th>Id</th>
-                <th>Date Received</th>
-                <th>Customer</th>
-                <th>City</th>
-                <th>Street</th>
-                <th>Operation</th>
-                <th>Notes</th>
-                <th>Status</th>
+                <th style="width: 3%">Id</th>
+                <th style="width: 10%">Date Received</th>
+                <th class="col-md-1">Customer</th>
+                <th class="col-md-2">City</th>
+                <th class="col-md-2">Street</th>
+                <th class="col-md-1">Operation</th>
+                <th class="col-md-3">Notes</th>
+                <th class="col-md-1">Status</th>
               </tr>
             </thead>
             <tbody>

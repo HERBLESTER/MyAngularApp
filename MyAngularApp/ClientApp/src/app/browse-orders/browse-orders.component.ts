@@ -38,20 +38,65 @@ export class BrowseOrdersComponent implements OnInit {
   public selectedRow: Number;
   public loading = false;
 
+  orderCount = 0;
+  currentPage = 1;
+  maxSize: number = 0;
+  statusFilter: number = -1;
+
+  fetchPage(page: number) {
+    this.orderSubscription =
+      this.orderDataService.getPagedOrders(page)
+      .subscribe(result => this.setPagedOrders(page, result), err => this.toastr.error('Could not Retrieve Orders!', err));
+  }
+
+  ngOnInit() {
+    this.fetchPage(1);
+
+    this.detailStateSubscription = this.orderCompositeService.detailState.
+      subscribe(state => this.setDetailClosed());
+    
+    this.newOrderAddedSubscription =
+      this.orderCompositeService.newOrderSignal
+        .subscribe(order => this.orders.unshift(order));
+
+    this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
+  }
+
+  ngOnDetroy() {
+    if (this.detailStateSubscription)
+      this.detailStateSubscription.unsubscribe();
+    if (this.orderSubscription)
+      this.orderSubscription.unsubscribe();
+    if (this.newOrderAddedSubscription)
+      this.newOrderAddedSubscription.unsubscribe();
+    if (this.orderUpdatedSubscription)
+      this.orderUpdatedSubscription.unsubscribe();
+    if (this.scheduleOrdersSubscription)
+      this.scheduleOrdersSubscription.unsubscribe();
+  }
+
+  onStatusFilterChanged(status: number) {
+
+  }
+
+  pageChanged(event: any): void {
+    this.fetchPage(event.page);
+  }
+
   scheduleOrders() {
     this.loading = true;
 
     this.scheduleOrdersSubscription =
       this.orderDataService.scheduledOrders()
-      .subscribe(result => {
-        this.loading = false;
-        this.toastr.success(`Scheduled ${result} Orders!`);
-      },
-      err => {
-        this.toastr.error('Schedule Orders Failed! A Partial Update may have occurred', err);
-        this.loading = false;
-      }
-    );
+        .subscribe(result => {
+          this.loading = false;
+          this.toastr.success(`Scheduled ${result} Orders!`);
+        },
+          err => {
+            this.toastr.error('Schedule Orders Failed! A Partial Update may have occurred', err);
+            this.loading = false;
+          }
+        );
   }
 
   public setClickedRow(index: number, orderId: number) {
@@ -71,6 +116,17 @@ export class BrowseOrdersComponent implements OnInit {
     }
   }
 
+  private setDetailClosed() {
+    this.showDetail = false;
+  }
+
+  setPagedOrders(page: number, orders: Order[]) {
+    this.currentPage = page;
+    this.orders = orders;
+    this.orderCount = orders[0].orderCount;
+    this.maxSize = Math.floor(this.orderCount / 10);
+  }
+
   public showNewOrder() {
     this.showDetail = true;
     if (this.router.url.indexOf('detail') !== -1) {
@@ -82,59 +138,10 @@ export class BrowseOrdersComponent implements OnInit {
     }
   }
 
-  private setDetailClosed() {
-    this.showDetail = false;
-  }
-
-  orderCount = 0;
-  currentPage = 1;
-  maxSize: number = 0;
-  pageChanged(event: any): void {
-    this.fetchPage(event.page);
-  }
-
-  fetchPage(page: number) {
-    this.orderSubscription =
-      this.orderDataService.getPagedOrders(page)
-      .subscribe(result => this.setPagedOrders(page, result), err => this.toastr.error('Could not Retrieve Orders!', err));
-  }
-
-  setPagedOrders(page: number, orders: Order[]) {
-    this.currentPage = page;
-    this.orders = orders;
-    this.orderCount = orders[0].orderCount;
-    this.maxSize = Math.floor(this.orderCount / 10);
-  }
-
-  ngOnInit() {
-    this.fetchPage(1);
-
-    this.detailStateSubscription = this.orderCompositeService.detailState.
-      subscribe(state => this.setDetailClosed());
-    
-    this.newOrderAddedSubscription =
-      this.orderCompositeService.newOrderSignal
-        .subscribe(order => this.orders.unshift(order));
-
-    this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
-  }
-
   updateOrder(order: Order) {
     const index: number = this.orders.findIndex(o => o.id === order.id);
     if (index !== -1)
       this.orders.splice(index, 1, order);
   }
 
-  ngOnDetroy() {
-    if (this.detailStateSubscription)
-      this.detailStateSubscription.unsubscribe();
-    if (this.orderSubscription)
-      this.orderSubscription.unsubscribe();
-    if (this.newOrderAddedSubscription)
-      this.newOrderAddedSubscription.unsubscribe();
-    if (this.orderUpdatedSubscription)
-      this.orderUpdatedSubscription.unsubscribe();
-    if (this.scheduleOrdersSubscription)
-      this.scheduleOrdersSubscription.unsubscribe();
-  }
 }

@@ -3,11 +3,23 @@
     <div [ngClass]="{ 'col-md-8': showDetail }">
       <div class='panel panel-primary'>
         <div class='panel-heading'>
-          <p>
-            Browse Orders: <span *ngIf="!orders" class="flash"><em> Loading...</em></span>
-            <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
-            <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
-          </p>
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders" class="flash"><em> Loading...</em></span></div>
+              <label class="col-sm-1 control-label text-right">Filter:</label>
+              <div class="col-sm-7 pull-left">
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="All" [(ngModel)]="statusFilter" [value]="-1" [checked]="statusFilter === -1">All</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Received" [(ngModel)]="statusFilter" [value]="0" [checked]="statusFilter === 0">Received</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Scheduled" [(ngModel)]="statusFilter" [value]="1" [checked]="statusFilter === -1">Scheduled</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Cancelled" [(ngModel)]="statusFilter" [value]="2" [checked]="statusFilter === -1">Cancelled</label>
+                <label class="radio-inline" style="margin-left: 0px"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Completed" [(ngModel)]="statusFilter" [value]="3" [checked]="statusFilter === -1">Completed</label>
+              </div>
+              <div class="col-sm-2">
+                <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
+                <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
+              </div>
+            </div>
+          </div>
           <div class="panel-title">
             <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
                         (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"

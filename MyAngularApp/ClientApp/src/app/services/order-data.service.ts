@@ -24,9 +24,10 @@ export class OrderDataService {
       catchError(ErrorHandlerService.handleError));
   }
 
-  getPagedOrders(pageNumber: number): Observable<Order[]> {
+  getPagedOrders(pageNumber: number, status: number): Observable<Order[]> {
     const params = new HttpParams()
-      .set('page', pageNumber.toString());
+      .set('page', pageNumber.toString())
+      .set('status', status.toString());
 
     return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetPagedOrders', { params })
       .pipe(

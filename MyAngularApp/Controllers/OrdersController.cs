@@ -48,9 +48,9 @@ namespace MyAngularApp.Controllers
 
         [Route("~/api/Orders/GetPagedorders")]
         [HttpGet]
-        public async Task<IActionResult> GetPagedOrders([FromQuery(Name = "page")]int pageNumber)
+        public async Task<IActionResult> GetPagedOrders([FromQuery(Name = "page")]int pageNumber, [FromQuery(Name = "status")]int statusCode)
         {
-            int orderCount = await _context.Orders.CountAsync();
+            int orderCount = 0;
 
             IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
                 .Select(o => new OrderVM
@@ -62,11 +62,24 @@ namespace MyAngularApp.Controllers
                     notes = o.Notes,
                     operationName = o.Operation.Name,
                     status = o.Status,
-                    street = o.Street,
-                    orderCount = orderCount
-                }).OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10);
+                    street = o.Street
+                });
 
-            IEnumerable<OrderVM> orders = await orderVMs.ToListAsync();
+            if (statusCode != -1)
+            {
+                orderCount = await _context.Orders.Where(o => (int)o.Status == statusCode).CountAsync();
+                orderVMs = orderVMs.Where(o => (int)o.status == statusCode);
+            }
+            else
+            {
+                orderCount = await _context.Orders.CountAsync();
+            }
+
+            OrderVM[] orders = await orderVMs.OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10).ToArrayAsync();
+            if (orders.Count() > 0)
+            {
+                orders[0].orderCount = orderCount;
+            }
 
             return Ok(orders);
         }

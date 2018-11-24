@@ -28,11 +28,11 @@ export class BrowseOrdersComponent implements OnInit {
   private newOrderAddedSubscription: Subscription;
   private orderUpdatedSubscription: Subscription;
   private scheduleOrdersSubscription: Subscription;
+  public orderSubscription: Subscription;
 
   public showDetail: boolean = false;
 
   public Status = Status;
-  public orderSubscription: Subscription;
   public orders: Order[];
   public newOrderAdded: boolean = false;
   public selectedRow: Number;
@@ -44,9 +44,17 @@ export class BrowseOrdersComponent implements OnInit {
   statusFilter: number = -1;
 
   fetchPage(page: number) {
+    this.loading = true;
+
     this.orderSubscription =
-      this.orderDataService.getPagedOrders(page)
-      .subscribe(result => this.setPagedOrders(page, result), err => this.toastr.error('Could not Retrieve Orders!', err));
+      this.orderDataService.getPagedOrders(page, this.statusFilter)
+      .subscribe(result => {
+        this.setPagedOrders(page, result);
+        this.loading = false;
+        }, err => {
+          this.toastr.error('Could not Retrieve Orders!', err);
+          this.loading = false;
+        });
   }
 
   ngOnInit() {
@@ -57,7 +65,11 @@ export class BrowseOrdersComponent implements OnInit {
     
     this.newOrderAddedSubscription =
       this.orderCompositeService.newOrderSignal
-        .subscribe(order => this.orders.unshift(order));
+        .subscribe(order => {
+          //this.orders.unshift(order)
+          this.statusFilter = Status.Received;
+          this.fetchPage(1);
+        });
 
     this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
   }
@@ -76,7 +88,8 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   onStatusFilterChanged(status: number) {
-
+    this.statusFilter = status;
+    this.fetchPage(1);
   }
 
   pageChanged(event: any): void {
@@ -120,11 +133,16 @@ export class BrowseOrdersComponent implements OnInit {
     this.showDetail = false;
   }
 
-  setPagedOrders(page: number, orders: Order[]) {
+  private setPagedOrders(page: number, orders: Order[]) {
     this.currentPage = page;
     this.orders = orders;
-    this.orderCount = orders[0].orderCount;
-    this.maxSize = Math.floor(this.orderCount / 10);
+    if (orders.length > 0) {
+      this.orderCount = orders[0].orderCount;
+    }
+    else {
+      this.orderCount = 0;
+      this.toastr.info('No Orders Retrieved')
+    }
   }
 
   public showNewOrder() {

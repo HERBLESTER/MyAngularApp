@@ -7,14 +7,14 @@
             <div class="row">
               <div class="col-sm-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders" class="flash"><em> Loading...</em></span></div>
               <label class="col-sm-1 control-label text-right">Filter:</label>
-              <div class="col-sm-7 pull-left">
-                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="All" [(ngModel)]="statusFilter" [value]="-1" [checked]="statusFilter === -1">All</label>
-                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Received" [(ngModel)]="statusFilter" [value]="0" [checked]="statusFilter === 0">Received</label>
-                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Scheduled" [(ngModel)]="statusFilter" [value]="1" [checked]="statusFilter === -1">Scheduled</label>
-                <label class="radio-inline"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Cancelled" [(ngModel)]="statusFilter" [value]="2" [checked]="statusFilter === -1">Cancelled</label>
-                <label class="radio-inline" style="margin-left: 0px"> <input (click)="onStatusFilterChanged(statusFilter)" type="radio" name="status" id="Completed" [(ngModel)]="statusFilter" [value]="3" [checked]="statusFilter === -1">Completed</label>
+              <div class="col-sm-6 pull-left">
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(-1)" type="radio" name="status" id="All" [value]="-1" [checked]="statusFilter === -1">All</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(0)" type="radio" name="status" id="Received"  [value]="0" [checked]="statusFilter === 0">Received</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(1)" type="radio" name="status" id="Scheduled" [value]="1" [checked]="statusFilter === 1">Scheduled</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(3)" type="radio" name="status" id="Cancelled" [value]="3" [checked]="statusFilter === 3">Cancelled</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(4)" type="radio" name="status" id="Completed" [value]="4" [checked]="statusFilter === 4">Completed</label>
               </div>
-              <div class="col-sm-2">
+              <div class="col-sm-3">
                 <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
                 <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
               </div>
@@ -28,7 +28,7 @@
           </div>
         </div>
         <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate"></ngx-loading>
-        <div class="table-responsive">
+        <div class="table-responsive" style="min-height: 100px;">
           <table class="table table-striped table-condensed table-hover" *ngIf="orders">
             <thead>
               <tr>

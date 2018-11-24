@@ -44,4 +44,4 @@ export class CompletedOrder {
   asset: string;
 }
 
-export enum Status { Received, enRoute, Cancelled, Completed }
+export enum Status { Received, Scheduled, enRoute, Cancelled, Completed }

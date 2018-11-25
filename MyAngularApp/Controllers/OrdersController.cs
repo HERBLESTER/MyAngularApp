@@ -84,6 +84,61 @@ namespace MyAngularApp.Controllers
             return Ok(orders);
         }
 
+        [Route("~/api/Orders/GetSearchList")]
+        [HttpGet]
+        public async Task<IActionResult> GetSearchList([FromQuery(Name = "searchInput")]string searchInput)
+        {
+            string[] results;
+            if (searchInput.Length > 0) {
+                IQueryable<string> orders =
+                    _context.Orders.Where(o => o.Street.IndexOf(searchInput) > 0).Select(o => o.Street).
+                    Union(_context.Orders.Include("Customer").Where(o => o.Customer.Name.IndexOf(searchInput) > 0).Select(o => o.Customer.Name));
+
+                results = await orders.Take(10).ToArrayAsync();
+                return Ok(results);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        [Route("~/api/Orders/GetSearchOrders")]
+        [HttpGet]
+        public async Task<IActionResult> GetSearchOrders([FromQuery(Name = "page")]int pageNumber, [FromQuery(Name = "status")]int statusCode)
+        {
+            int orderCount = 0;
+
+            IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
+                .Select(o => new OrderVM
+                {
+                    id = o.Id,
+                    cityName = o.City.Name,
+                    customerName = o.Customer.Name,
+                    dateReceived = o.DateReceived,
+                    notes = o.Notes,
+                    operationName = o.Operation.Name,
+                    status = o.Status,
+                    street = o.Street
+                });
+
+            if (statusCode != -1)
+            {
+                orderCount = await _context.Orders.Where(o => (int)o.Status == statusCode).CountAsync();
+                orderVMs = orderVMs.Where(o => (int)o.status == statusCode);
+            }
+            else
+            {
+                orderCount = await _context.Orders.CountAsync();
+            }
+
+            OrderVM[] orders = await orderVMs.OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10).ToArrayAsync();
+            if (orders.Count() > 0)
+            {
+                orders[0].orderCount = orderCount;
+            }
+
+            return Ok(orders);
+        }
         [HttpGet("{orderId}")]
         public async Task<IActionResult> Get(int orderId)
         {

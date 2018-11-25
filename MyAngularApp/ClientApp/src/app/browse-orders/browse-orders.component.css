@@ -31,3 +31,20 @@ button {
   margin-left: 10px;
   margin-right: 10px;
 }
+
+.radio-inline + .radio-inline {
+  margin-left: 0;
+}
+
+.radio-inline {
+  margin-right: 10px;
+}
+
+.search-list {
+  color: black;
+}
+
+.search-div {
+  position: absolute;
+  top: 40px;
+}

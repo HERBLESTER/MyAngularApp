@@ -1,14 +1,16 @@
 import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+
+import { Subscription, Subject } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+
+import { OrderCompositeService } from '../services/order-composite.service';
+import { UtilitiesService } from '../services/utilities.service';
+import { SearchService } from '../services/search-service.service';
+
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
-import { Observable } from 'rxjs/Observable';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
-import { OrderCompositeService } from '../services/order-composite.service';
-import { Subscription } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
-import { UtilitiesService } from '../services/utilities.service';
 
 @Component({
   selector: 'app-browse-orders',
@@ -22,7 +24,21 @@ export class BrowseOrdersComponent implements OnInit {
     public orderCompositeService: OrderCompositeService,
     public toastr: ToastrService,
     private utilities: UtilitiesService,
-    public router: Router) { }
+    public router: Router,
+    public searchService: SearchService) {
+
+    this.searchService.getSearchTerms(this.searchTerm$)
+      .subscribe(results => {
+        this.results = results;
+      });
+  }
+
+  selectSearchTerm(term: string) {
+
+  }
+
+  results: string[];
+  searchTerm$ = new Subject<string>();
 
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;

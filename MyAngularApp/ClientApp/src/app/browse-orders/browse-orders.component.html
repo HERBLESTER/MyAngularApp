@@ -7,9 +7,9 @@
             <div class="row">
               <div class="col-sm-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders" class="flash"><em> Loading...</em></span></div>
               <label class="col-sm-1 control-label text-right">Filter:</label>
-              <div class="col-sm-6 pull-left">
+              <div class="col-sm-6">
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(-1)" type="radio" name="status" id="All" [value]="-1" [checked]="statusFilter === -1">All</label>
-                <label class="radio-inline"> <input (click)="onStatusFilterChanged(0)" type="radio" name="status" id="Received"  [value]="0" [checked]="statusFilter === 0">Received</label>
+                <label class="radio-inline"> <input (click)="onStatusFilterChanged(0)" type="radio" name="status" id="Received" [value]="0" [checked]="statusFilter === 0">Received</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(1)" type="radio" name="status" id="Scheduled" [value]="1" [checked]="statusFilter === 1">Scheduled</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(3)" type="radio" name="status" id="Cancelled" [value]="3" [checked]="statusFilter === 3">Cancelled</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(4)" type="radio" name="status" id="Completed" [value]="4" [checked]="statusFilter === 4">Completed</label>
@@ -19,12 +19,27 @@
                 <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
               </div>
             </div>
-          </div>
-          <div class="panel-title">
-            <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
-                        (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"
-                        previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
-            </pagination>
+            <div class="row">
+              <div class="col-md-6">
+                <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
+                            (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"
+                            previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
+                </pagination>
+              </div>
+              <div class="col-md-4 pull-right" style="margin-top: 20px">
+                <form>
+                      <input type="search" class="form-control" placeholder="Search" (keyup)="searchTerm$.next($event.target.value)" (onsearch)="searchTerm$.next($event.target.value)">
+                      <!--<span class="input-group-btn">
+                        <button type="submit" class="btn btn-default pull-left">Submit</button>
+                      </span>-->
+                </form>
+                <div class="search-div">
+                  <ul *ngIf="results" class="list-group">
+                    <li *ngFor="let result of results | slice:0:9" class="list-group-item search-list" (click)="selectSearchTerm(result)">{{ result }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate"></ngx-loading>
@@ -62,7 +77,5 @@
       <router-outlet name="detail">
       </router-outlet>
     </div>
-    
   </div>
 </div>
-

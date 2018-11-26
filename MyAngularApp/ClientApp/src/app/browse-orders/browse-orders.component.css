@@ -42,9 +42,10 @@ button {
 
 .search-list {
   color: black;
+  cursor: pointer;
 }
 
 .search-div {
   position: absolute;
-  top: 40px;
+  top: 35px;
 }

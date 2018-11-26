@@ -26,18 +26,19 @@
                             previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
                 </pagination>
               </div>
-              <div class="col-md-4 pull-right" style="margin-top: 20px">
-                <form>
-                      <input type="search" class="form-control" placeholder="Search" (keyup)="searchTerm$.next($event.target.value)" (onsearch)="searchTerm$.next($event.target.value)">
-                      <!--<span class="input-group-btn">
-                        <button type="submit" class="btn btn-default pull-left">Submit</button>
-                      </span>-->
+              <div class="col-md-6" style="margin-top: 20px">
+                <form class="form-inline pull-right">
+                  <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)">
+                  <span>
+                    <button type="submit" class="btn btn-default" style="margin-left: 0px">Search</button>
+                  </span>
+
+                  <div class="search-div">
+                    <ul *ngIf="searchResults" class="list-group">
+                      <li *ngFor="let result of searchResults | slice:0:9" class="list-group-item search-list" (click)="selectSearchTerm(result)">{{ result }}</li>
+                    </ul>
+                  </div>
                 </form>
-                <div class="search-div">
-                  <ul *ngIf="results" class="list-group">
-                    <li *ngFor="let result of results | slice:0:9" class="list-group-item search-list" (click)="selectSearchTerm(result)">{{ result }}</li>
-                  </ul>
-                </div>
               </div>
             </div>
           </div>
@@ -74,7 +75,7 @@
       </div>
     </div>
     <div *ngIf="showDetail" class="col-md-4">
-      <router-outlet name="detail">
+      <router-outlet name="detail" #detail>
       </router-outlet>
     </div>
   </div>

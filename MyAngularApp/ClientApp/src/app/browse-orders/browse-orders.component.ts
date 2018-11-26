@@ -25,19 +25,31 @@ export class BrowseOrdersComponent implements OnInit {
     public toastr: ToastrService,
     private utilities: UtilitiesService,
     public router: Router,
-    public searchService: SearchService) {
+    public searchService: SearchService) {  }
 
-    this.searchService.getSearchTerms(this.searchTerm$)
-      .subscribe(results => {
-        this.results = results;
-      });
+  onSearch(val: string) {
+    if (val.length > 2) {
+      this.searchService.searchEntries(val, this.statusFilter)
+        .subscribe(results => {
+          this.searchResults = results;
+        });
+    }
+    else {
+      this.clearSearchResults();
+    }
+  }
+
+  clearSearchResults() {
+    if (this.searchResults && this.searchResults.length > 0) {
+      this.searchResults.length = 0;
+    }
   }
 
   selectSearchTerm(term: string) {
 
   }
 
-  results: string[];
+  searchResults: string[];
   searchTerm$ = new Subject<string>();
 
   private detailStateSubscription: Subscription;
@@ -82,12 +94,12 @@ export class BrowseOrdersComponent implements OnInit {
     this.newOrderAddedSubscription =
       this.orderCompositeService.newOrderSignal
         .subscribe(order => {
-          //this.orders.unshift(order)
           this.statusFilter = Status.Received;
           this.fetchPage(1);
         });
 
     this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
+   
   }
 
   ngOnDetroy() {
@@ -104,8 +116,11 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   onStatusFilterChanged(status: number) {
-    this.statusFilter = status;
-    this.fetchPage(1);
+    if (status != this.statusFilter) {
+      this.statusFilter = status;
+      this.clearSearchResults();
+      this.fetchPage(1);
+    }
   }
 
   pageChanged(event: any): void {

@@ -86,20 +86,44 @@ namespace MyAngularApp.Controllers
 
         [Route("~/api/Orders/GetSearchList")]
         [HttpGet]
-        public async Task<IActionResult> GetSearchList([FromQuery(Name = "searchInput")]string searchInput)
+        public async Task<IActionResult> GetSearchList([FromQuery(Name = "searchInput")]string searchInput, [FromQuery(Name = "status")] int statusCode)
         {
             string[] results;
-            if (searchInput.Length > 0) {
-                IQueryable<string> orders =
-                    _context.Orders.Where(o => o.Street.IndexOf(searchInput) > 0).Select(o => o.Street).
-                    Union(_context.Orders.Include("Customer").Where(o => o.Customer.Name.IndexOf(searchInput) > 0).Select(o => o.Customer.Name));
+            if (searchInput.TrimStart().Length > 0) {
 
-                results = await orders.Take(10).ToArrayAsync();
+                IQueryable<Order> baseQuery = _context.Orders;
+                if (statusCode != -1)
+                {
+                    baseQuery = baseQuery.Where(o => (int)o.Status == statusCode);
+                }
+
+                IQueryable<string> searchTerms =
+                    baseQuery.Where(o => o.Street.Contains(searchInput)).Select(o => o.Street).
+                    Union(baseQuery.Include("Customer").Where(o => o.Customer.Name.Contains(searchInput)).Select(o => o.Customer.Name)).
+                    Union(baseQuery.Include("City").Where(o => o.City.Name.Contains(searchInput)).Select(o => o.City.Name)).
+                    Union(baseQuery.Where(o => o.Notes.Contains(searchInput)).Select(o => o.Notes));
+
+                int id = 0;
+                if(int.TryParse(searchInput, out id))
+                {
+                    searchTerms = searchTerms.Union(baseQuery.Where(o => o.Id.ToString().Contains(searchInput)).Select(o => o.Id.ToString()));
+                }
+
+                DateTime received;
+                if(DateTime.TryParse(searchInput, out received))
+                {
+                    searchTerms = searchTerms.Union(baseQuery.Where(o => 
+                    o.DateReceived.ToString("d").Contains(searchInput)).Select(o => o.DateReceived.ToString("d")));
+                }
+
+                
+
+                results = await searchTerms.Take(10).ToArrayAsync();
                 return Ok(results);
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Invalid search input");
             }
         }
         [Route("~/api/Orders/GetSearchOrders")]

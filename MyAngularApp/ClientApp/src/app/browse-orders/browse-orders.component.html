@@ -5,7 +5,7 @@
         <div class='panel-heading'>
           <div class="container-fluid">
             <div class="row">
-              <div class="col-sm-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders" class="flash"><em> Loading...</em></span></div>
+              <div class="col-sm-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders"><em> Loading...</em></span></div>
               <label class="col-sm-1 control-label text-right">Filter:</label>
               <div class="col-sm-6">
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(-1)" type="radio" name="status" id="All" [value]="-1" [checked]="statusFilter === -1">All</label>
@@ -51,7 +51,7 @@
             </div>
           </div>
         </div>
-        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate"></ngx-loading>
+        <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
         <div class="table-responsive" style="min-height: 100px;">
           <table class="table table-striped table-condensed table-hover" *ngIf="orders">
             <thead>
@@ -83,8 +83,9 @@
       </div>
     </div>
     <div *ngIf="showDetail" class="col-md-4">
-      <router-outlet name="detail" #detail>
+      <router-outlet name="detail" id="detail">
       </router-outlet>
     </div>
   </div>
+  <div  id="scrollBottom"></div>
 </div>

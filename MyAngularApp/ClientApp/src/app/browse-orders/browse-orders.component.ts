@@ -175,7 +175,13 @@ export class BrowseOrdersComponent implements OnInit {
           .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')'));
       }
       else {
-        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')');
+        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')')
+          .then(_ => {
+            const element = document.getElementById('scrollBottom');
+            setTimeout(() => {
+              element.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+          });
       }
     }
   }
@@ -203,7 +209,13 @@ export class BrowseOrdersComponent implements OnInit {
         .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
     }
     else {
-      this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
+      this.router.navigateByUrl(this.router.url + '/(detail:new-order)')
+        .then(_ => {
+          const element = document.getElementById('scrollBottom');
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }, 500);
+        });
     }
   }
 

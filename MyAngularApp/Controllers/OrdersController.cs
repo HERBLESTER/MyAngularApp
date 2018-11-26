@@ -48,11 +48,28 @@ namespace MyAngularApp.Controllers
 
         [Route("~/api/Orders/GetPagedorders")]
         [HttpGet]
-        public async Task<IActionResult> GetPagedOrders([FromQuery(Name = "page")]int pageNumber, [FromQuery(Name = "status")]int statusCode)
+        public async Task<IActionResult> GetPagedOrders(
+            [FromQuery(Name = "page")]int pageNumber, 
+            [FromQuery(Name = "status")]int statusCode,
+            [FromQuery(Name = "searchTerm")]string searchTerm)
         {
             int orderCount = 0;
+            IQueryable<Order> orders = _context.Orders;
 
-            IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
+            if (searchTerm != null && searchTerm.TrimStart().Length > 0)
+            {
+                orders = this.GetSearchQuery(searchTerm);
+            }
+
+            if (statusCode != -1)
+            {
+                orders = orders.Where(o => (int)o.Status == statusCode);
+            }
+
+            orderCount = await orders.CountAsync();
+
+            OrderVM[] model = await orders.Include("Customer").Include("City").Include("Operation").
+                OrderByDescending(o => o.DateReceived).Skip(10 * (pageNumber - 1)).Take(10)
                 .Select(o => new OrderVM
                 {
                     id = o.Id,
@@ -63,25 +80,14 @@ namespace MyAngularApp.Controllers
                     operationName = o.Operation.Name,
                     status = o.Status,
                     street = o.Street
-                });
-
-            if (statusCode != -1)
+                }).ToArrayAsync();
+           
+            if (model.Count() > 0)
             {
-                orderCount = await _context.Orders.Where(o => (int)o.Status == statusCode).CountAsync();
-                orderVMs = orderVMs.Where(o => (int)o.status == statusCode);
-            }
-            else
-            {
-                orderCount = await _context.Orders.CountAsync();
+                model[0].orderCount = orderCount;
             }
 
-            OrderVM[] orders = await orderVMs.OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10).ToArrayAsync();
-            if (orders.Count() > 0)
-            {
-                orders[0].orderCount = orderCount;
-            }
-
-            return Ok(orders);
+            return Ok(model);
         }
 
         [Route("~/api/Orders/GetSearchList")]
@@ -126,43 +132,7 @@ namespace MyAngularApp.Controllers
                 return BadRequest("Invalid search input");
             }
         }
-        [Route("~/api/Orders/GetSearchOrders")]
-        [HttpGet]
-        public async Task<IActionResult> GetSearchOrders([FromQuery(Name = "page")]int pageNumber, [FromQuery(Name = "status")]int statusCode)
-        {
-            int orderCount = 0;
-
-            IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
-                .Select(o => new OrderVM
-                {
-                    id = o.Id,
-                    cityName = o.City.Name,
-                    customerName = o.Customer.Name,
-                    dateReceived = o.DateReceived,
-                    notes = o.Notes,
-                    operationName = o.Operation.Name,
-                    status = o.Status,
-                    street = o.Street
-                });
-
-            if (statusCode != -1)
-            {
-                orderCount = await _context.Orders.Where(o => (int)o.Status == statusCode).CountAsync();
-                orderVMs = orderVMs.Where(o => (int)o.status == statusCode);
-            }
-            else
-            {
-                orderCount = await _context.Orders.CountAsync();
-            }
-
-            OrderVM[] orders = await orderVMs.OrderByDescending(o => o.dateReceived).Skip(10 * (pageNumber - 1)).Take(10).ToArrayAsync();
-            if (orders.Count() > 0)
-            {
-                orders[0].orderCount = orderCount;
-            }
-
-            return Ok(orders);
-        }
+      
         [HttpGet("{orderId}")]
         public async Task<IActionResult> Get(int orderId)
         {
@@ -381,5 +351,31 @@ namespace MyAngularApp.Controllers
             return _context.Orders.Any(e => e.Id == id);
         }
 
+        private IQueryable<Order> GetSearchQuery(string searchInput)
+        {
+            IQueryable<Order> baseQuery = _context.Orders;
+
+            IQueryable<Order> search =
+                baseQuery.Where(o => o.Street.Contains(searchInput)).
+                Union(baseQuery.Include("Customer").Where(o => o.Customer.Name.Contains(searchInput))).
+                Union(baseQuery.Include("City").Where(o => o.City.Name.Contains(searchInput))).
+                Union(baseQuery.Where(o => o.Notes.Contains(searchInput)));
+
+            int id = 0;
+            if (int.TryParse(searchInput, out id))
+            {
+                search = search.Union(baseQuery.Where(o => o.Id.ToString().Contains(searchInput)));
+            }
+
+            //todo: more dates
+            DateTime received;
+            if (DateTime.TryParse(searchInput, out received))
+            {
+                search = search.Union(baseQuery.Where(o =>
+                o.DateReceived.ToString("d").Contains(searchInput)));
+            }
+
+            return search;
+        }
     }
 }

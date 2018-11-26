@@ -28,6 +28,7 @@ export class BrowseOrdersComponent implements OnInit {
     public searchService: SearchService) {  }
 
   onSearch(val: string) {
+    this.searchTerm = val;
     if (val.length > 2) {
       this.searchService.searchEntries(val, this.statusFilter)
         .subscribe(results => {
@@ -39,18 +40,32 @@ export class BrowseOrdersComponent implements OnInit {
     }
   }
 
+  clearSearch() {
+    this.useSearchTerm = false;
+    this.searchTerm = "";
+    this.fetchPage(1);
+  }
+
+  isSearchTermValid() {
+    return this.searchTerm.length > 2
+  }
+
   clearSearchResults() {
     if (this.searchResults && this.searchResults.length > 0) {
       this.searchResults.length = 0;
     }
   }
 
-  selectSearchTerm(term: string) {
-
+  search(term: string) {
+    this.searchTerm = term;
+    this.useSearchTerm = true;
+    this.fetchPage(1);
+    this.clearSearchResults();
   }
 
+  useSearchTerm: boolean = false;
   searchResults: string[];
-  searchTerm$ = new Subject<string>();
+  searchTerm: string = "";
 
   private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
@@ -73,9 +88,14 @@ export class BrowseOrdersComponent implements OnInit {
 
   fetchPage(page: number) {
     this.loading = true;
+    let term: string = "";
+
+    if (this.useSearchTerm) {
+      term = this.searchTerm;
+    }
 
     this.orderSubscription =
-      this.orderDataService.getPagedOrders(page, this.statusFilter)
+      this.orderDataService.getPagedOrders(page, this.statusFilter, term)
       .subscribe(result => {
         this.setPagedOrders(page, result);
         this.loading = false;

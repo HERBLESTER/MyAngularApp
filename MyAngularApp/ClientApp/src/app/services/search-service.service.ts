@@ -22,4 +22,15 @@ export class SearchService {
           retry(1),
           catchError(ErrorHandlerService.handleError));
   }
+
+  search(term: string, status: number): Observable<string[]> {
+    const params = new HttpParams()
+      .set('searchInput', term.toString())
+      .set('status', status.toString());
+
+    return this.http.get<string[]>(this.baseUrl + 'api/Orders/Search', { params })
+      .pipe(
+        retry(1),
+        catchError(ErrorHandlerService.handleError));
+  }
 }

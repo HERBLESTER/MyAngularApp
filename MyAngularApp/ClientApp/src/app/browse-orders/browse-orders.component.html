@@ -28,14 +28,22 @@
               </div>
               <div class="col-md-6" style="margin-top: 20px">
                 <form class="form-inline pull-right">
-                  <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)">
+                  <div *ngIf="useSearchTerm">
+                    {{searchTerm | slice:0:30}}
+                    <button type="button" class="btn btn-default" (click)="clearSearch()" *ngIf="useSearchTerm">
+                      Clear Search
+                    </button>
+                  </div>
+                  <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)" #searchVal *ngIf="!useSearchTerm">
                   <span>
-                    <button type="submit" class="btn btn-default" style="margin-left: 0px">Search</button>
+                    <button type="button" class="btn btn-default" style="margin-left: 0px" [disabled]="!isSearchTermValid()"
+                            (click)="search(searchVal.value)" *ngIf="!useSearchTerm">
+                      Search
+                    </button>
                   </span>
-
                   <div class="search-div">
                     <ul *ngIf="searchResults" class="list-group">
-                      <li *ngFor="let result of searchResults | slice:0:9" class="list-group-item search-list" (click)="selectSearchTerm(result)">{{ result }}</li>
+                      <li *ngFor="let result of searchResults | slice:0:9" class="list-group-item search-list" (click)="search(result)">{{ result }}</li>
                     </ul>
                   </div>
                 </form>

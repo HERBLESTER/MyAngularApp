@@ -16,6 +16,7 @@
     color: black;
   }
 }
+
 .table tr.active td {
   background-color: lightgray !important;
   color: white;

@@ -1,8 +1,8 @@
-import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 
-import { Subscription, Subject } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 import { OrderCompositeService } from '../services/order-composite.service';
@@ -18,14 +18,49 @@ import { Status } from '../domain/domain';
   styleUrls: ['./browse-orders.component.css'],
   providers: [OrderCompositeService]
 })
-export class BrowseOrdersComponent implements OnInit {
-
-  constructor(public orderDataService: OrderDataService,
+export class BrowseOrdersComponent implements OnInit, OnDestroy {
+   constructor(public orderDataService: OrderDataService,
     public orderCompositeService: OrderCompositeService,
     public toastr: ToastrService,
     private utilities: UtilitiesService,
     public router: Router,
     public searchService: SearchService) {  }
+
+  useSearchTerm: boolean = false;
+  searchResults: string[];
+  searchTerm: string = "";
+
+  private detailStateSubscription: Subscription;
+  private newOrderAddedSubscription: Subscription;
+  private orderUpdatedSubscription: Subscription;
+  private scheduleOrdersSubscription: Subscription;
+  public orderSubscription: Subscription;
+
+  public showDetail: boolean = false;
+
+  public Status = Status;
+  public orders: Order[];
+  public newOrderAdded: boolean = false;
+  public selectedRow: Number;
+  public loading = false;
+
+  orderCount = 0;
+  currentPage = 1;
+  maxSize: number = 0;
+  statusFilter: number = -1;
+
+  ngOnDestroy(): void {
+    if (this.detailStateSubscription)
+      this.detailStateSubscription.unsubscribe();
+    if (this.orderSubscription)
+      this.orderSubscription.unsubscribe();
+    if (this.newOrderAddedSubscription)
+      this.newOrderAddedSubscription.unsubscribe();
+    if (this.orderUpdatedSubscription)
+      this.orderUpdatedSubscription.unsubscribe();
+    if (this.scheduleOrdersSubscription)
+      this.scheduleOrdersSubscription.unsubscribe();
+  }
 
   onSearch(val: string) {
     this.searchTerm = val;
@@ -63,28 +98,21 @@ export class BrowseOrdersComponent implements OnInit {
     this.clearSearchResults();
   }
 
-  useSearchTerm: boolean = false;
-  searchResults: string[];
-  searchTerm: string = "";
+  completeOrder(orderId: number, event, index) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDetail = true;
 
-  private detailStateSubscription: Subscription;
-  private newOrderAddedSubscription: Subscription;
-  private orderUpdatedSubscription: Subscription;
-  private scheduleOrdersSubscription: Subscription;
-  public orderSubscription: Subscription;
+    if (this.router.url.indexOf('detail') !== -1) {
+      this.router.navigate([this.utilities.getParentRoute(this.router.url)])
+        .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:complete-order/' + orderId + ')'));
+    }
+    else {
+      this.router.navigateByUrl(this.router.url + '/(detail:complete-order/' + orderId + ')');
+    }
 
-  public showDetail: boolean = false;
-
-  public Status = Status;
-  public orders: Order[];
-  public newOrderAdded: boolean = false;
-  public selectedRow: Number;
-  public loading = false;
-
-  orderCount = 0;
-  currentPage = 1;
-  maxSize: number = 0;
-  statusFilter: number = -1;
+    this.selectedRow = index;
+  }
 
   fetchPage(page: number) {
     this.loading = true;
@@ -122,18 +150,7 @@ export class BrowseOrdersComponent implements OnInit {
    
   }
 
-  ngOnDetroy() {
-    if (this.detailStateSubscription)
-      this.detailStateSubscription.unsubscribe();
-    if (this.orderSubscription)
-      this.orderSubscription.unsubscribe();
-    if (this.newOrderAddedSubscription)
-      this.newOrderAddedSubscription.unsubscribe();
-    if (this.orderUpdatedSubscription)
-      this.orderUpdatedSubscription.unsubscribe();
-    if (this.scheduleOrdersSubscription)
-      this.scheduleOrdersSubscription.unsubscribe();
-  }
+ 
 
   onStatusFilterChanged(status: number) {
     if (status != this.statusFilter) {
@@ -175,13 +192,7 @@ export class BrowseOrdersComponent implements OnInit {
           .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')'));
       }
       else {
-        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')')
-          .then(_ => {
-            const element = document.getElementById('scrollBottom');
-            setTimeout(() => {
-              element.scrollIntoView({ behavior: 'smooth' });
-            }, 500);
-          });
+        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')');
       }
     }
   }
@@ -209,13 +220,7 @@ export class BrowseOrdersComponent implements OnInit {
         .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
     }
     else {
-      this.router.navigateByUrl(this.router.url + '/(detail:new-order)')
-        .then(_ => {
-          const element = document.getElementById('scrollBottom');
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 500);
-        });
+      this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
     }
   }
 

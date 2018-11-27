@@ -1,4 +1,4 @@
-import { Component, OnInit, Directive, Output, EventEmitter, HostListener, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, ViewChild } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
@@ -35,7 +35,7 @@ export class PendingChangesGuard implements CanDeactivate<ComponentCanDeactivate
   templateUrl: './new-order.component.html',
   styleUrls: ['./new-order.component.css']
 })
-export class NewOrderComponent implements OnInit, ComponentCanDeactivate {
+export class NewOrderComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
   constructor(
     private utilities: UtilitiesService,
     public orderDataService: OrderDataService,

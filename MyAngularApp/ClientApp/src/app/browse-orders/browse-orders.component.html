@@ -57,25 +57,36 @@
             <thead>
               <tr>
                 <th style="width: 3%">Id</th>
-                <th style="width: 10%">Date Received</th>
+                <th style="width: 10%" *ngIf="statusFilter == -1 || statusFilter == 0">Date Received</th>
+                <th style="width: 10%" *ngIf="statusFilter == 1 ">Date Scheduled</th>
+                <th style="width: 10%" *ngIf="statusFilter == 3 ">Date Cancelled</th>
+                <th style="width: 10%" *ngIf="statusFilter == 4 ">Date Completed</th>
                 <th class="col-md-1">Customer</th>
-                <th class="col-md-2">City</th>
+                <th class="col-md-1">City</th>
                 <th class="col-md-2">Street</th>
                 <th class="col-md-1">Operation</th>
-                <th class="col-md-3">Notes</th>
-                <th class="col-md-1">Status</th>
+                <th class="col-md-3" *ngIf="statusFilter != 4">Notes</th>
+                <th class="col-md-1" *ngIf="statusFilter == 4">Asset</th>
+                <th class="col-md-2" *ngIf="statusFilter == 4">Installer Notes</th>
+                <th class="col-md-1" *ngIf="statusFilter == -1 || statusFilter == 1">Status</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let order of orders; let i = index" (click)="setClickedRow(i, order.id)" [class.active]="i == selectedRow">
                 <td>{{order.id}}</td>
-                <td>{{order.dateReceived | date:'short'}}</td>
+                <td *ngIf="statusFilter == -1 || statusFilter == 0">{{order.dateReceived | date:'short'}}</td>
+                <td *ngIf="statusFilter == 1">{{order.scheduled | date:'short'}}</td>
+                <td *ngIf="statusFilter == 3">{{order.cancelled | date:'short'}}</td>
+                <td *ngIf="statusFilter == 4">{{order.completed | date:'short'}}</td>
                 <td>{{order.customerName}}</td>
                 <td>{{order.cityName}}</td>
                 <td>{{order.street}}</td>
                 <td>{{order.operationName}}</td>
-                <td>{{order.notes}}</td>
-                <td>{{Status[order.status]}}</td>
+                <td *ngIf="statusFilter == 4">{{order.asset}}</td>
+                <td *ngIf="statusFilter == 4">{{order.installerNotes}}</td>
+                <td *ngIf="statusFilter != 4">{{order.notes | slice:0:40}}<span *ngIf="order && order.notes && order.notes.length > 40">...</span></td>
+                <td *ngIf="Status[order.status] != 'Scheduled'">{{Status[order.status]}}</td>
+                <td *ngIf="Status[order.status] == 'Scheduled'"><a (click)="completeOrder(order.id, $event, i)">{{Status[order.status]}}</a></td>
               </tr>
             </tbody>
           </table>
@@ -87,5 +98,5 @@
       </router-outlet>
     </div>
   </div>
-  <div  id="scrollBottom"></div>
+  <div id="scrollBottom"></div>
 </div>

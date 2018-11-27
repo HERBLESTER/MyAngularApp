@@ -79,7 +79,12 @@ namespace MyAngularApp.Controllers
                     notes = o.Notes,
                     operationName = o.Operation.Name,
                     status = o.Status,
-                    street = o.Street
+                    street = o.Street,
+                    asset = o.Asset,
+                    cancelled = o.DateCancelled,
+                    completed = o.DateCompleted,
+                    installerComments = o.InstallerComments,
+                    scheduled = o.DateScheduled
                 }).ToArrayAsync();
            
             if (model.Count() > 0)
@@ -180,6 +185,12 @@ namespace MyAngularApp.Controllers
             }
 
             Order order = await _context.Orders.FindAsync(orderVM.id);
+
+            if (orderVM.status != order.Status && orderVM.status == Status.Cancelled)
+            {
+                order.DateCancelled = DateTime.Now;
+            }
+
             order.Id = orderVM.id;
             order.CityId = orderVM.cityId;
             order.CustomerId = orderVM.customerId;
@@ -189,7 +200,7 @@ namespace MyAngularApp.Controllers
             order.Street = orderVM.street;
 
             _context.Entry(order).State = EntityState.Modified;
-
+            
             try
             {
                 await _context.SaveChangesAsync();
@@ -297,9 +308,45 @@ namespace MyAngularApp.Controllers
             return Ok( count );
         }
 
-        public class ScheduledResult
+        [HttpPost]
+        [Route("~/api/Orders/CompleteOrder")]
+        public async Task<IActionResult> CompleteOrder([FromBody] CompletedOrderVM completedOrderVM)
         {
-            public int count;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Order order = await _context.Orders.FindAsync(completedOrderVM.OrderId);
+            if(order == null)
+            {
+                return NotFound();
+            }
+
+            order.Status = Status.Completed;
+            order.DateCompleted = completedOrderVM.Completed;
+            order.InstallerComments = completedOrderVM.Comments;
+            order.Asset = completedOrderVM.Asset;
+
+            _context.Entry(order).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrderExists(order.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(completedOrderVM);
         }
 
         public class CompletedOrderVM
@@ -324,6 +371,11 @@ namespace MyAngularApp.Controllers
             public string notes;
             public Status status;
             public int orderCount;
+            public string asset;
+            public string installerComments;
+            public DateTime completed;
+            public DateTime cancelled;
+            public DateTime scheduled;
         }
         // DELETE: api/Orders/5
         // [HttpDelete("{id}")]

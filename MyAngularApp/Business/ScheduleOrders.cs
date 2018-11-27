@@ -29,6 +29,7 @@ namespace MyAngularApp.Business
         {
             Order o = _context.Orders.Find(order.Id);
             o.Status = Status.Scheduled;
+            o.DateScheduled = DateTime.Now;
             await _context.SaveChangesAsync();
             this.count++;
         }

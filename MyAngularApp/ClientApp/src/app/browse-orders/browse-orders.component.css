@@ -25,3 +25,5 @@ button {
   position: absolute;
   top: 35px;
 }
+
+a {cursor: pointer;}

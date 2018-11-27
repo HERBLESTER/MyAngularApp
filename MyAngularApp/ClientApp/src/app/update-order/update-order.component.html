@@ -1,8 +1,8 @@
-  <div class='panel panel-primary'>
+  <div class='panel panel-primary' id="formTop">
     <div class='panel-heading'>
       <p>
         Update Order
-        <button class="btn btn-primary btn-xs panel-title pull-right" [disabled]="isCanceled()" (click)="cancelOrder()">Cancel Order</button>
+        <button class="btn btn-primary btn-xs panel-title pull-right" [disabled]="isCanceled() || isCompleted()" (click)="cancelOrder()">Cancel Order</button>
       </p>
     </div>
     <div class='panel-body'>
@@ -40,7 +40,7 @@
         </div>
         <div class="form-group">
           <label for="notes">Notes</label>
-          <input type="text" class="form-control" id="notes" formControlName="notes">
+          <textarea class="form-control" id="notes" formControlName="notes"></textarea>
         </div>
         <div class="form-group">
           <label for="status">Status</label>
@@ -48,7 +48,7 @@
         </div>
         <div class="btn-toolbar">
           <div class="btn-group btn-group-justified" role="group">
-            <button type="submit" class="btn btn-success" [disabled]="!isValid">Submit</button>
+            <button type="submit" class="btn btn-success" [disabled]="!updateForm.valid">Submit</button>
             <button type="button" class="btn btn-default" (click)="onCancel($event)">Cancel</button>
           </div>
         </div>

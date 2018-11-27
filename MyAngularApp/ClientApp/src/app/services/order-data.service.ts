@@ -56,7 +56,9 @@ export class OrderDataService {
       .pipe(catchError(ErrorHandlerService.handleError));
   }
 
-  getCompletedOrders(begin: Date, end: Date) { }
-  completeOrder(completedOrder: CompletedOrder) { }
+  completeOrder(completedOrder: CompletedOrder): Observable<CompletedOrder> {
+    return this.http.post<CompletedOrder>(this.baseUrl + 'api/Orders/CompleteOrder', completedOrder, httpOptions)
+      .pipe(catchError(ErrorHandlerService.handleError));
+  }
 }
 

@@ -14,9 +14,11 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { NewOrderComponent } from './new-order/new-order.component';
 import { BrowseOrdersComponent } from './browse-orders/browse-orders.component';
 import { SearchOrdersComponent } from './search-orders/search-orders.component';
+import { UpdateOrderComponent } from './update-order/update-order.component';
+import { CompleteOrderComponent } from './complete-order/complete-order.component';
+
 import { MetaDataService } from './services/meta-data.service';
 import { OrderDataService } from './services/order-data.service';
-import { UpdateOrderComponent } from './update-order/update-order.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +28,7 @@ import { UpdateOrderComponent } from './update-order/update-order.component';
     BrowseOrdersComponent,
     SearchOrdersComponent,
     UpdateOrderComponent,
+    CompleteOrderComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -41,7 +44,8 @@ import { UpdateOrderComponent } from './update-order/update-order.component';
         path: 'browse-orders', component: BrowseOrdersComponent,
         children: [
           { path: 'new-order', component: NewOrderComponent, outlet: "detail" },
-          { path: 'update-order/:id', component: UpdateOrderComponent, outlet: "detail" }]
+          { path: 'update-order/:id', component: UpdateOrderComponent, outlet: "detail" },
+          { path: 'complete-order/:id', component: CompleteOrderComponent, outlet: "detail" }]
       },
       { path: '', redirectTo: '/browse-orders', pathMatch: 'full'}
     ], { enableTracing: true })

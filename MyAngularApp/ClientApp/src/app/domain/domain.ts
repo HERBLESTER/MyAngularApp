@@ -33,11 +33,16 @@ export class Order {
   public operationName: string;
   public notes: string;
   public status: Status = Status.Received;
+  public completed: Date;
+  public asset: string;
+  public installerComment: string;
   public orderCount: number;
+  public cancelled: Date;
+  public scheduled: Date;
+
 }
 
-export class CompletedOrder {
-  public constructor() { }
+export interface CompletedOrder {
   orderId: number;
   comments: string;
   completed: Date;

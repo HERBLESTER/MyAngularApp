@@ -1,23 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
-import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
 import { UtilitiesService } from '../services/utilities.service';
-import { NgForm, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-update-order',
   templateUrl: './update-order.component.html',
   styleUrls: ['./update-order.component.css']
 })
-export class UpdateOrderComponent implements OnInit {
+export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private utilities: UtilitiesService,
     public orderDataService: OrderDataService,
@@ -26,9 +25,7 @@ export class UpdateOrderComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private orderCompositeService: OrderCompositeService,
-    private formBuilder: FormBuilder) {
-    
-  }
+    private formBuilder: FormBuilder) {  }
 
   submitted = false;
 
@@ -39,7 +36,13 @@ export class UpdateOrderComponent implements OnInit {
   metaData: MetaData;
   model: Order;
   updateForm: FormGroup;
-  isValid: boolean;
+
+  ngAfterViewInit() {
+      setTimeout(() => {
+        let element = document.getElementById('detail');
+        element.scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+  }
 
   get street() {
     return this.updateForm.get('street').value;
@@ -48,7 +51,11 @@ export class UpdateOrderComponent implements OnInit {
   isCanceled(): boolean {
     return this.model && this.model.status && this.model.status === Status.Cancelled;
   }
- 
+
+  isCompleted(): boolean {
+    return this.model && this.model.status && this.model.status === Status.Completed;
+  }
+
   cancelOrder() {
     this.model.status = Status.Cancelled;
     this.updateForm.get('status').setValue(Status[this.model.status]);
@@ -91,14 +98,13 @@ export class UpdateOrderComponent implements OnInit {
 
     this.updateForm.controls['street'].markAsTouched();
     this.updateForm.controls['street'].updateValueAndValidity();
-    this.isValid = this.updateForm.valid;
   }
 
   ngOnInit() {
 
     const id: number = this.route.snapshot.params['id'];
     if (!this.model || !this.model.id || this.model.id !== id) {
-      this.orderDataService.getOrder(this.route.snapshot.params['id'])
+      this.orderDataService.getOrder(id)
         .subscribe(result => this.setupForm(result), err => this.toastr.error('Order Fetch Failed!', err));
     }
     

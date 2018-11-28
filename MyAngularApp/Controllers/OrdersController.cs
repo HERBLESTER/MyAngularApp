@@ -68,8 +68,29 @@ namespace MyAngularApp.Controllers
 
             orderCount = await orders.CountAsync();
 
+            switch ((Status)statusCode)
+            {
+                case Status.Received:
+                    orders = orders.OrderByDescending(o => o.DateReceived);
+                    break;
+                case Status.Scheduled:
+                    orders = orders.OrderByDescending(o => o.DateScheduled);
+                    break;
+                //case Status.enRoute:
+                //    break;
+                case Status.Cancelled:
+                    orders = orders.OrderByDescending(o => o.DateCancelled);
+                    break;
+                case Status.Completed:
+                    orders = orders.OrderByDescending(o => o.DateCompleted);
+                    break;
+                default:
+                    orders = orders.OrderByDescending(o => o.DateReceived);
+                    break;
+            }
+
             OrderVM[] model = await orders.Include("Customer").Include("City").Include("Operation").
-                OrderByDescending(o => o.DateReceived).Skip(10 * (pageNumber - 1)).Take(10)
+                Skip(10 * (pageNumber - 1)).Take(10)
                 .Select(o => new OrderVM
                 {
                     id = o.Id,

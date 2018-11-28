@@ -169,9 +169,10 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
 
     this.scheduleOrdersSubscription =
       this.orderDataService.scheduledOrders()
-        .subscribe(result => {
-          this.loading = false;
-          this.toastr.success(`Scheduled ${result} Orders!`);
+      .subscribe(result => {
+        this.statusFilter = Status.Scheduled;
+        this.toastr.success(`Scheduled ${result} Orders!`);
+        this.fetchPage(1);
         },
           err => {
             this.toastr.error('Schedule Orders Failed! A Partial Update may have occurred', err);

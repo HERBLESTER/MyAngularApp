@@ -1,32 +1,32 @@
 <div class="container-fluid">
   <div class="row">
-    <div [ngClass]="{ 'col-md-8': showDetail }">
+    <div [ngClass]="{ 'col-md-8 col-sm-8 hidden-xs': showDetail }">
       <div class='panel panel-primary'>
         <div class='panel-heading'>
           <div class="container-fluid">
             <div class="row">
-              <div class="col-sm-2 col-xs-3 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders"><em> Loading...</em></span></div>
+              <div class="col-sm-2 col-xs-2 text-left panel-title"><em>Browse Orders</em><span *ngIf="!orders"><em> Loading...</em></span></div>
               <label class="col-sm-1 col-xs-1 control-label text-right">Filter:</label>
-              <div class="col-sm-6 col-xs-8">
+              <div class="col-sm-4 col-xs-9">
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(-1)" type="radio" name="status" id="All" [value]="-1" [checked]="statusFilter === -1">All</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(0)" type="radio" name="status" id="Received" [value]="0" [checked]="statusFilter === 0">Received</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(1)" type="radio" name="status" id="Scheduled" [value]="1" [checked]="statusFilter === 1">Scheduled</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(3)" type="radio" name="status" id="Cancelled" [value]="3" [checked]="statusFilter === 3">Cancelled</label>
                 <label class="radio-inline"> <input (click)="onStatusFilterChanged(4)" type="radio" name="status" id="Completed" [value]="4" [checked]="statusFilter === 4">Completed</label>
               </div>
-              <div class="col-sm-3 col-xs-11 pull-right">
+              <div class="col-sm-5 col-xs-12 pull-right">
                 <button class="btn btn-primary btn-xs panel-title pull-right" (click)="showNewOrder()">New Order</button>
                 <button class="btn btn-primary btn-xs panel-title pull-right" (click)="scheduleOrders()">Schedule Orders</button>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6 col-sm-6 col-xs-7">
+              <div class="col-sm-6 col-xs-6">
                 <pagination [boundaryLinks]="true" [totalItems]="orderCount" [pageBtnClass]="btn-xs" [rotate]="false" [itemsPerPage]="10"
                             (pageChanged)="pageChanged($event)" [(ngModel)]="currentPage"
                             previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
                 </pagination>
               </div>
-              <div class="col-md-6 col-sm-6 col-xs-5" style="margin-top: 20px">
+              <div class="col-sm-6 col-xs-6" style="margin-top: 20px">
                 <form class="form-inline pull-right">
                   <div *ngIf="useSearchTerm">
                     {{searchTerm | slice:0:30}}
@@ -35,7 +35,7 @@
                     </button>
                   </div>
                     <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)"
-                           #searchVal *ngIf="!useSearchTerm" style="display: inline-block; width: 68%">
+                           #searchVal *ngIf="!useSearchTerm">
                       <button type="button" class="btn btn-default" style="margin-left: 0px" [disabled]="!isSearchTermValid()"
                               (click)="search(searchVal.value)" *ngIf="!useSearchTerm">
                         Search
@@ -92,7 +92,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="showDetail" class="col-md-4">
+    <div *ngIf="showDetail" class="col-md-4 col-sm-4 col-xs-12">
       <router-outlet name="detail" id="detail">
       </router-outlet>
     </div>

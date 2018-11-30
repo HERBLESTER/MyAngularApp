@@ -16,14 +16,4 @@ button {
   margin-right: 10px;
 }
 
-.search-list {
-  color: black;
-  cursor: pointer;
-}
-
-.search-div {
-  position: absolute;
-  top: 35px;
-}
-
 a {cursor: pointer;}

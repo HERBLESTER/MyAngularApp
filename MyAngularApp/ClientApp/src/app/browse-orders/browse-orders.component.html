@@ -26,27 +26,7 @@
                             previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
                 </pagination>
               </div>
-              <div class="col-sm-6 col-xs-6" style="margin-top: 20px">
-                <form class="form-inline pull-right">
-                  <div *ngIf="useSearchTerm">
-                    {{searchTerm | slice:0:30}}
-                    <button type="button" class="btn btn-sm btn-default" (click)="clearSearch()" *ngIf="useSearchTerm">
-                      Clear Search
-                    </button>
-                  </div>
-                    <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)"
-                           #searchVal *ngIf="!useSearchTerm">
-                      <button type="button" class="btn btn-default" style="margin-left: 0px" [disabled]="!isSearchTermValid()"
-                              (click)="search(searchVal.value)" *ngIf="!useSearchTerm">
-                        Search
-                      </button>
-                  <div class="search-div">
-                    <ul *ngIf="searchResults" class="list-group">
-                      <li *ngFor="let result of searchResults | slice:0:9" class="list-group-item search-list" (click)="search(result)">{{ result }}</li>
-                    </ul>
-                  </div>
-                </form>
-              </div>
+              <app-search-orders [statusFilter]="statusFilter" (executeSearch)="executeSearch($event)" [clearSearchEvent]="clearSearch.asObservable()"></app-search-orders>
             </div>
           </div>
         </div>

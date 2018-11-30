@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { Router, ActivatedRoute,  } from '@angular/router';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -27,13 +27,13 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
      public activatedRoute: ActivatedRoute) { }
 
   useSearchTerm: boolean = false;
-  searchResults: string[];
   searchTerm: string = "";
 
   private newOrderAddedSubscription: Subscription;
   private orderUpdatedSubscription: Subscription;
   private scheduleOrdersSubscription: Subscription;
   public orderSubscription: Subscription;
+  private clearSearch: Subject<void> = new Subject<void>();
 
   public showDetail: boolean = false;
   private thisRoute: string = "";
@@ -60,40 +60,11 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
       this.scheduleOrdersSubscription.unsubscribe();
   }
 
-  onSearch(val: string) {
-    this.searchTerm = val;
-    if (val.length > 2) {
-      this.searchService.searchEntries(val, this.statusFilter)
-        .subscribe(results => {
-          this.searchResults = results;
-        });
-    }
-    else {
-      this.clearSearchResults();
-    }
-  }
 
-  clearSearch() {
-    this.useSearchTerm = false;
-    this.searchTerm = "";
-    this.fetchPage(1);
-  }
-
-  isSearchTermValid() {
-    return this.searchTerm.length > 2
-  }
-
-  clearSearchResults() {
-    if (this.searchResults && this.searchResults.length > 0) {
-      this.searchResults.length = 0;
-    }
-  }
-
-  search(term: string) {
+  executeSearch(term: string) {
     this.searchTerm = term;
-    this.useSearchTerm = true;
+    this.useSearchTerm = term && term.length > 0;
     this.fetchPage(1);
-    this.clearSearchResults();
   }
 
   completeOrder(orderId: number, event, index) {
@@ -140,7 +111,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   onStatusFilterChanged(status: number) {
     if (status != this.statusFilter) {
       this.statusFilter = status;
-      this.clearSearchResults();
+      this.clearSearch.next();
       this.fetchPage(1);
     }
   }

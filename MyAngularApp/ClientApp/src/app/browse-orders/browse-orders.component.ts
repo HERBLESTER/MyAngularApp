@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute,  } from '@angular/router';
 
 import { Subscription } from 'rxjs';
+
 import { ToastrService } from 'ngx-toastr';
 
 import { OrderCompositeService } from '../services/order-composite.service';
-import { UtilitiesService } from '../services/utilities.service';
 import { SearchService } from '../services/search-service.service';
 
 import { Order } from '../domain/domain';
@@ -22,21 +22,21 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
    constructor(public orderDataService: OrderDataService,
     public orderCompositeService: OrderCompositeService,
     public toastr: ToastrService,
-    private utilities: UtilitiesService,
     public router: Router,
-    public searchService: SearchService) {  }
+    public searchService: SearchService,
+     public activatedRoute: ActivatedRoute) { }
 
   useSearchTerm: boolean = false;
   searchResults: string[];
   searchTerm: string = "";
 
-  private detailStateSubscription: Subscription;
   private newOrderAddedSubscription: Subscription;
   private orderUpdatedSubscription: Subscription;
   private scheduleOrdersSubscription: Subscription;
   public orderSubscription: Subscription;
 
   public showDetail: boolean = false;
+  private thisRoute: string = "";
 
   public Status = Status;
   public orders: Order[];
@@ -50,8 +50,6 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   statusFilter: number = -1;
 
   ngOnDestroy(): void {
-    if (this.detailStateSubscription)
-      this.detailStateSubscription.unsubscribe();
     if (this.orderSubscription)
       this.orderSubscription.unsubscribe();
     if (this.newOrderAddedSubscription)
@@ -101,15 +99,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   completeOrder(orderId: number, event, index) {
     event.preventDefault();
     event.stopPropagation();
-    this.showDetail = true;
-
-    if (this.router.url.indexOf('detail') !== -1) {
-      this.router.navigate([this.utilities.getParentRoute(this.router.url)])
-        .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:complete-order/' + orderId + ')'));
-    }
-    else {
-      this.router.navigateByUrl(this.router.url + '/(detail:complete-order/' + orderId + ')');
-    }
+    this.router.navigate([this.thisRoute, { outlets: { 'detail': ['complete-order', orderId] } }]);
 
     this.selectedRow = index;
   }
@@ -134,10 +124,8 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.thisRoute = this.router.url;
     this.fetchPage(1);
-
-    this.detailStateSubscription = this.orderCompositeService.detailState.
-      subscribe(state => this.setDetailClosed());
     
     this.newOrderAddedSubscription =
       this.orderCompositeService.newOrderSignal
@@ -147,10 +135,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
         });
 
     this.orderUpdatedSubscription = this.orderCompositeService.updatedOrderSignal.subscribe(order => this.updateOrder(order));
-   
   }
-
- 
 
   onStatusFilterChanged(status: number) {
     if (status != this.statusFilter) {
@@ -183,23 +168,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
 
   public setClickedRow(index: number, orderId: number) {
     this.selectedRow = index;
-    this.showDetail = true;
-    if (this.router.url.indexOf('update-order') !== -1) {
-      this.orderCompositeService.signalOrderSelected(this.orders[index]);
-    }
-    else {
-      if (this.router.url.indexOf('detail') !== -1) {
-        this.router.navigate([this.utilities.getParentRoute(this.router.url)])
-          .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')'));
-      }
-      else {
-        this.router.navigateByUrl(this.router.url + '/(detail:update-order/' + orderId + ')');
-      }
-    }
-  }
-
-  private setDetailClosed() {
-    this.showDetail = false;
+    this.router.navigate([this.thisRoute, { outlets: { 'detail': ['update-order', orderId] } }]);
   }
 
   private setPagedOrders(page: number, orders: Order[]) {
@@ -215,14 +184,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   }
 
   public showNewOrder() {
-    this.showDetail = true;
-    if (this.router.url.indexOf('detail') !== -1) {
-      this.router.navigate([this.utilities.getParentRoute(this.router.url)])
-        .then(_ => this.router.navigateByUrl(this.router.url + '/(detail:new-order)'));
-    }
-    else {
-      this.router.navigateByUrl(this.router.url + '/(detail:new-order)');
-    }
+    this.router.navigate([this.thisRoute, { outlets: { 'detail': ['new-order'] } }]);
   }
 
   updateOrder(order: Order) {

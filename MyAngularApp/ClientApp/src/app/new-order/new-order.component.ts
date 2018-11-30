@@ -2,9 +2,6 @@ import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, ViewChild } 
 import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
-import { City } from '../domain/domain';
-import { Operation } from '../domain/domain';
-import { Customer } from '../domain/domain';
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
@@ -12,9 +9,7 @@ import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
-import { UtilitiesService } from '../services/utilities.service';
 import { NgForm } from '@angular/forms';
-import { catchError } from 'rxjs/operators';
 
 export interface ComponentCanDeactivate {
   canDeactivate: () => boolean | Observable<boolean>;
@@ -37,7 +32,6 @@ export class PendingChangesGuard implements CanDeactivate<ComponentCanDeactivate
 })
 export class NewOrderComponent implements OnInit, ComponentCanDeactivate, OnDestroy {
   constructor(
-    private utilities: UtilitiesService,
     public orderDataService: OrderDataService,
     public metaDataService: MetaDataService,
     public toastr: ToastrService,
@@ -55,19 +49,18 @@ export class NewOrderComponent implements OnInit, ComponentCanDeactivate, OnDest
   submitted = false;
   error: any;
 
-  subscription: Subscription;
+  metaDataSubscription: Subscription;
+  orderDataSubscription: Subscription;
   metaData: MetaData;
   model: Order;
 
   onCancel() {
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
-    this.orderCompositeService.setDetailState(false);
+    this.router.navigate(['../']);
   }
 
   onSubmit(form: NgForm) {
     this.submitted = true;
-    this.orderDataService.newOrder(this.model)
-       // .pipe(catchError(err => this.error = err))
+    this.orderDataSubscription = this.orderDataService.newOrder(this.model)
         .subscribe(result =>
         this.processNewOrder(result), err => this.toastr.error('Order Creation Failed!', err));
   }
@@ -80,13 +73,17 @@ export class NewOrderComponent implements OnInit, ComponentCanDeactivate, OnDest
   }
 
   ngOnInit() {
-    this.subscription = this.metaDataService.metaData.subscribe(result => this.metaData = result);
+    this.metaDataSubscription = this.metaDataService.metaData.subscribe(result => this.metaData = result);
     this.model = new Order();
   }
 
   ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
+    if (this.metaDataSubscription) {
+      this.metaDataSubscription.unsubscribe();
+    }
+
+    if (this.orderDataSubscription) {
+      this.orderDataSubscription.unsubscribe();
     }
   }
 }

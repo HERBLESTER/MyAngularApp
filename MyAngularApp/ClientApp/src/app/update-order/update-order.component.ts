@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { OrderDataService } from '../services/order-data.service';
 import { MetaDataService } from '../services/meta-data.service';
 import { MetaData } from '../domain/domain';
@@ -8,41 +8,34 @@ import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router, ActivatedRoute, CanDeactivate } from '@angular/router';
 import { OrderCompositeService } from '../services/order-composite.service';
-import { UtilitiesService } from '../services/utilities.service';
 import { FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-update-order',
   templateUrl: './update-order.component.html',
-  styleUrls: ['./update-order.component.css']
-})
-export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
+  styleUrls: ['./update-order.component.css'],
 
-  constructor(private utilities: UtilitiesService,
-    public orderDataService: OrderDataService,
+})
+export class UpdateOrderComponent implements OnInit, OnDestroy {
+
+  constructor(public orderDataService: OrderDataService,
     public metaDataService: MetaDataService,
     public toastr: ToastrService,
     private router: Router,
     private route: ActivatedRoute,
     private orderCompositeService: OrderCompositeService,
-    private formBuilder: FormBuilder) {  }
+    private formBuilder: FormBuilder) { }
 
   submitted = false;
 
   metaDataSubscription: Subscription;
   orderSubscription: Subscription;
-  orderSelectedSubscription: Subscription;
+  orderFetchSubscription: Subscription;
+  paramSubscription: Subscription;
 
   metaData: MetaData;
   model: Order;
   updateForm: FormGroup;
-
-  ngAfterViewInit() {
-      setTimeout(() => {
-        let element = document.getElementById('detail');
-        element.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
-  }
 
   get street() {
     return this.updateForm.get('street').value;
@@ -62,8 +55,7 @@ export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   onCancel() {
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
-    this.orderCompositeService.setDetailState(false);//todo: use router listen
+    this.router.navigate(['../']);
   }
 
   onSubmit() {
@@ -79,10 +71,9 @@ export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   signalOrderUpdated(order: Order) {
-    this.orderCompositeService.signalOrderUpdated(order)
-    this.orderCompositeService.setDetailState(false);
+    this.orderCompositeService.signalOrderUpdated(order);
     this.toastr.success('Order Updated!', 'Success!');
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
+    this.router.navigate(['../']);
   }
 
   setupForm(order: Order) {
@@ -95,22 +86,16 @@ export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
       notes: new FormControl(this.model.notes),
       status: new FormControl(Status[this.model.status])
     });
-
-    this.updateForm.controls['street'].markAsTouched();
-    this.updateForm.controls['street'].updateValueAndValidity();
   }
 
   ngOnInit() {
 
-    const id: number = this.route.snapshot.params['id'];
-    if (!this.model || !this.model.id || this.model.id !== id) {
-      this.orderDataService.getOrder(id)
-        .subscribe(result => this.setupForm(result), err => this.toastr.error('Order Fetch Failed!', err));
-    }
-    
-    this.orderSelectedSubscription = this.orderCompositeService.selectedOrderSignal
-      .subscribe(order => this.orderDataService.getOrder(order.id)
-        .subscribe(result => this.setupForm(result)), err => this.toastr.error('Order Fetch Failed!', err));
+    this.paramSubscription = this.route.paramMap.subscribe(p => {
+      const id: number = +p.get("id");
+      console.log('id', id);
+      this.orderFetchSubscription = this.orderDataService.getOrder(id)
+        .subscribe(result => this.setupForm(result)), err => this.toastr.error('Order Fetch Failed!', err);
+    });
 
     this.metaDataSubscription =
       this.metaDataService.metaData.subscribe(
@@ -122,11 +107,14 @@ export class UpdateOrderComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.metaDataSubscription) {
       this.metaDataSubscription.unsubscribe();
     }
-    if (this.orderSelectedSubscription) {
-      this.orderSelectedSubscription.unsubscribe();
+    if (this.orderFetchSubscription) {
+      this.orderFetchSubscription.unsubscribe();
     }
     if (this.orderSubscription) {
       this.orderSubscription.unsubscribe();
-    }    
+    }
+    if (this.paramSubscription) {
+      this.paramSubscription.unsubscribe();
+    }
   }
 }

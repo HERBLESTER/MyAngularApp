@@ -7,7 +7,6 @@ import { ToastrService } from 'ngx-toastr';
 
 import { OrderDataService } from '../services/order-data.service';
 import { OrderCompositeService } from '../services/order-composite.service';
-import { UtilitiesService } from '../services/utilities.service';
 
 import { CompletedOrder } from '../domain/domain';
 import { Order } from '../domain/domain';
@@ -18,10 +17,9 @@ import { Status } from '../domain/domain';
   templateUrl: './complete-order.component.html',
   styleUrls: ['./complete-order.component.css']
 })
-export class CompleteOrderComponent implements OnInit, OnDestroy, AfterViewInit {
+export class CompleteOrderComponent implements OnInit, OnDestroy {
 
-  constructor(private utilities: UtilitiesService,
-    public orderDataService: OrderDataService,
+  constructor(public orderDataService: OrderDataService,
     public toastr: ToastrService,
     private router: Router,
     private route: ActivatedRoute,
@@ -33,19 +31,13 @@ export class CompleteOrderComponent implements OnInit, OnDestroy, AfterViewInit 
   order: Order;
   submitted = false;
   orderSubscription: Subscription;
-  public Status = Status;
-
-  ngAfterViewInit() {
-    setTimeout(() => {
-      let element = document.getElementById('detail');
-      element.scrollIntoView({ behavior: 'smooth' });
-    }, 500);
-  }
+  orderFetchSubscription: Subscription;
+  Status = Status;
 
   ngOnInit() {
     const id: number = this.route.snapshot.params['id'];
 
-    this.orderDataService.getOrder(id)
+    this.orderFetchSubscription = this.orderDataService.getOrder(id)
       .subscribe(result => this.setupForm(result), err => this.toastr.error('Order Fetch Failed!', err));
   }
 
@@ -63,8 +55,7 @@ export class CompleteOrderComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   onCancel() {
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
-    this.orderCompositeService.setDetailState(false);//todo: use router listen
+    this.router.navigate(['../']);
   }
 
   get completed() {
@@ -79,7 +70,7 @@ export class CompleteOrderComponent implements OnInit, OnDestroy, AfterViewInit 
 
     this.orderSubscription = this.orderDataService.completeOrder(this.model)
       .subscribe(result => {
-        this.orderDataService.getOrder(result.orderId)
+        this.orderFetchSubscription = this.orderDataService.getOrder(result.orderId)
           .subscribe(
             result => this.signalOrderUpdated(result),
             err => this.toastr.error('Order Refresh Failed!', err));
@@ -88,14 +79,17 @@ export class CompleteOrderComponent implements OnInit, OnDestroy, AfterViewInit 
 
   signalOrderUpdated(order: Order) {
     this.orderCompositeService.signalOrderUpdated(order)
-    this.orderCompositeService.setDetailState(false);
     this.toastr.success('Order Completed!', 'Success!');
-    this.router.navigate([this.utilities.getParentRoute(this.router.url)]);
+    this.router.navigate(['../']);
   }
 
   ngOnDestroy() {
     if (this.orderSubscription) {
       this.orderSubscription.unsubscribe();
+    }
+
+    if (this.orderFetchSubscription) {
+      this.orderFetchSubscription.unsubscribe();
     }
   }
 }

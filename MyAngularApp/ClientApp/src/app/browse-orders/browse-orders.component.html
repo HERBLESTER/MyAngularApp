@@ -57,9 +57,9 @@
               <tr>
                 <th style="width: 3%">Id</th>
                 <th style="width: 10%" *ngIf="statusFilter == -1 || statusFilter == 0">Date Received</th>
-                <th style="width: 10%" *ngIf="statusFilter == 1 ">Date Scheduled</th>
-                <th style="width: 10%" *ngIf="statusFilter == 3 ">Date Cancelled</th>
-                <th style="width: 10%" *ngIf="statusFilter == 4 ">Date Completed</th>
+                <th style="width: 10%" *ngIf="statusFilter == 1">Date Scheduled</th>
+                <th style="width: 10%" *ngIf="statusFilter == 3">Date Cancelled</th>
+                <th style="width: 10%" *ngIf="statusFilter == 4">Date Completed</th>
                 <th class="col-md-1">Customer</th>
                 <th class="col-md-1">City</th>
                 <th class="col-md-2">Street</th>
@@ -84,17 +84,16 @@
                 <td *ngIf="statusFilter == 4">{{order.asset}}</td>
                 <td *ngIf="statusFilter == 4">{{order.installerNotes}}</td>
                 <td *ngIf="statusFilter != 4">{{order.notes | slice:0:40}}<span *ngIf="order && order.notes && order.notes.length > 40">...</span></td>
-                <td *ngIf="Status[order.status] != 'Scheduled'">{{Status[order.status]}}</td>
-                <td *ngIf="Status[order.status] == 'Scheduled'"><a (click)="completeOrder(order.id, $event, i)">{{Status[order.status]}}</a></td>
+                <td *ngIf="(statusFilter == -1 || statusFilter == 1) && Status[order.status] != 'Scheduled'">{{Status[order.status]}}</td>
+                <td *ngIf="(statusFilter == -1 || statusFilter == 1) && Status[order.status] == 'Scheduled'"><a (click)="completeOrder(order.id, $event, i)">{{Status[order.status]}}</a></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-    <div *ngIf="showDetail" class="col-md-4 col-sm-4 col-xs-12">
-      <router-outlet name="detail" id="detail">
-      </router-outlet>
+    <div [ngClass]="{'col-md-4 col-sm-4 col-xs-12': showDetail}">
+      <router-outlet name="detail" id="detail" (activate)="showDetail=true;" (deactivate)="showDetail=false;"></router-outlet>
     </div>
   </div>
   <div id="scrollBottom"></div>

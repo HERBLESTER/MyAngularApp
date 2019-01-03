@@ -33,7 +33,7 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
   private orderUpdatedSubscription: Subscription;
   private scheduleOrdersSubscription: Subscription;
   public orderSubscription: Subscription;
-  private clearSearch: Subject<void> = new Subject<void>();
+  clearSearch: Subject<void> = new Subject<void>();
 
   public showDetail: boolean = false;
   private thisRoute: string = "";

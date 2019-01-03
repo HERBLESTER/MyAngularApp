@@ -32,7 +32,7 @@ namespace MyAngularApp
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=MyAngulrAppStorage;Trusted_Connection=True;ConnectRetryCount=0";
+            var connection = Configuration.GetConnectionString("MyAngulrAppStorage");
             services.AddDbContext<Context>
                 (options => options.UseSqlServer(connection));
             services.AddTransient<OrderSchedulingService>();
@@ -40,8 +40,10 @@ namespace MyAngularApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Context dbContext)
         {
+            dbContext.Database.Migrate();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

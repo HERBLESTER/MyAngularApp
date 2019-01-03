@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { BrowseOrdersComponent } from './browse-orders.component';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { FormsModule } from '@angular/forms';
+import { SearchOrdersComponent } from '../search-orders/search-orders.component';
 
 describe('BrowseOrdersComponent', () => {
   let component: BrowseOrdersComponent;
@@ -8,7 +10,9 @@ describe('BrowseOrdersComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BrowseOrdersComponent ]
+      imports: [PaginationModule, FormsModule],
+      declarations: [BrowseOrdersComponent],
+      providers: [SearchOrdersComponent]
     })
     .compileComponents();
   }));
@@ -16,10 +20,13 @@ describe('BrowseOrdersComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BrowseOrdersComponent);
     component = fixture.componentInstance;
+    
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
 });

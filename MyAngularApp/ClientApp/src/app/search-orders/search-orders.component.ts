@@ -31,7 +31,9 @@ export class SearchOrdersComponent implements OnInit, OnDestroy {
     if (val.length > 2) {
       this.searchSubscription = this.searchService.searchEntries(val, this.statusFilter)
         .subscribe(results => {
-          this.searchResults = results;
+          if (!this.useSearchTerm) {
+            this.searchResults = results;
+          }
         });
     }
     else {

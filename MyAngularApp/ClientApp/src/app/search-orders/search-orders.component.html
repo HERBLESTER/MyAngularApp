@@ -1,15 +1,15 @@
 <div class="col-sm-6 col-xs-6" style="margin-top: 20px">
   <form class="form-inline pull-right">
     <div *ngIf="useSearchTerm">
-      {{searchTerm | slice:0:30}}
-      <button type="button" class="btn btn-sm btn-default" (click)="clearSearch()" *ngIf="useSearchTerm">
+      {{searchTerm | slice:0:30}}<span *ngIf="searchTerm && searchTerm.length > 30">...</span>
+      <button type="button" class="btn btn-sm btn-default" (click)="clearSearch()" *ngIf="useSearchTerm" style="margin-left: 10px;">
         Clear Search
       </button>
     </div>
-    <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)"
-           #searchVal *ngIf="!useSearchTerm">
+    <input type="search" class="form-control" placeholder="Search" (keyup)="onSearch($event.target.value)" (keyup.enter)="search(searchTerm)"
+           *ngIf="!useSearchTerm">
     <button type="button" class="btn btn-default" style="margin-left: 0px" [disabled]="!isSearchTermValid()"
-            (click)="search(searchVal.value)" *ngIf="!useSearchTerm">
+            (click)="search(searchTerm)" *ngIf="!useSearchTerm">
       Search
     </button>
     <div class="search-div">

@@ -7,7 +7,6 @@ import { Subscription, Subject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 import { OrderCompositeService } from '../services/order-composite.service';
-import { SearchService } from '../services/search-service.service';
 
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
@@ -23,7 +22,6 @@ export class BrowseOrdersComponent implements OnInit, OnDestroy {
     public orderCompositeService: OrderCompositeService,
     public toastr: ToastrService,
     public router: Router,
-    public searchService: SearchService,
      public activatedRoute: ActivatedRoute) { }
 
   useSearchTerm: boolean = false;

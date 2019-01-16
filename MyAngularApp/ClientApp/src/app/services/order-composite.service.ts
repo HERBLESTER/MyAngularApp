@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Order } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
-import { Observer, BehaviorSubject } from 'rxjs';
+import { Observer} from 'rxjs';
 
 @Injectable()
 export class OrderCompositeService {

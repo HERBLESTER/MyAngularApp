@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { MetaData } from '../domain/domain';
 import { Observable } from 'rxjs/Observable';
 import { ErrorHandlerService } from '../services/error-handler.service';

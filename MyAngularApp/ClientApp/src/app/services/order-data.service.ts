@@ -20,7 +20,7 @@ export class OrderDataService {
   getOrders(): Observable<Order[]> {
     return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetAllOrders')
       .pipe(
-      retry(3), // retry a failed request up to 3 times
+      retry(1),
       catchError(ErrorHandlerService.handleError));
   }
 
@@ -32,7 +32,7 @@ export class OrderDataService {
 
     return this.http.get<Order[]>(this.baseUrl + 'api/Orders/GetPagedOrders', { params })
       .pipe(
-        retry(3), // retry a failed request up to 3 times
+        retry(1), 
         catchError(ErrorHandlerService.handleError));
   }
 

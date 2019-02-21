@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +25,7 @@ namespace MyAngularApp.Controllers
 
         [Route("~/api/Orders/Getallorders")]
         [HttpGet]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<ActionResult<IEnumerable<OrderVM>>> GetAllOrders()
         {
             IQueryable<OrderVM> orderVMs = _context.Orders.Include("Customer").Include("City").Include("Operation")
                 .Select(o => new OrderVM {
@@ -41,14 +39,20 @@ namespace MyAngularApp.Controllers
                 street = o.Street
             }).OrderByDescending(o => o.dateReceived);
 
-            IEnumerable<OrderVM> orders = await orderVMs.ToListAsync();
-
-            return Ok(orders);
+            if (orderVMs.Count() > 0)
+            {
+                IEnumerable<OrderVM> orders = await orderVMs.ToListAsync();
+                return Ok(orders);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [Route("~/api/Orders/GetPagedorders")]
         [HttpGet]
-        public async Task<IActionResult> GetPagedOrders(
+        public async Task<ActionResult<IEnumerable<OrderVM>>> GetPagedOrders(
             [FromQuery(Name = "page")]int pageNumber, 
             [FromQuery(Name = "status")]int statusCode,
             [FromQuery(Name = "searchTerm")]string searchTerm)
@@ -118,7 +122,7 @@ namespace MyAngularApp.Controllers
 
         [Route("~/api/Orders/GetSearchList")]
         [HttpGet]
-        public async Task<IActionResult> GetSearchList([FromQuery(Name = "searchInput")]string searchInput, [FromQuery(Name = "status")] int statusCode)
+        public async Task<ActionResult<string[]>> GetSearchList([FromQuery(Name = "searchInput")]string searchInput, [FromQuery(Name = "status")] int statusCode)
         {
             string[] results;
             if (searchInput.TrimStart().Length > 0) {
@@ -160,7 +164,7 @@ namespace MyAngularApp.Controllers
         }
       
         [HttpGet("{orderId}")]
-        public async Task<IActionResult> Get(int orderId)
+        public async Task<ActionResult<OrderVM>> Get(int orderId)
         {
             if (!ModelState.IsValid)
             {
@@ -193,7 +197,7 @@ namespace MyAngularApp.Controllers
 
         // PUT: api/Orders/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder([FromRoute] int id, [FromBody] OrderVM orderVM)
+        public async Task<ActionResult<OrderVM>> UpdateOrder([FromRoute] int id, [FromBody] OrderVM orderVM)
         {
             if (!ModelState.IsValid)
             {
@@ -221,6 +225,7 @@ namespace MyAngularApp.Controllers
             order.Street = orderVM.street;
 
             _context.Entry(order).State = EntityState.Modified;
+            //_context.MarkAsModified(order);
             
             try
             {
@@ -264,7 +269,7 @@ namespace MyAngularApp.Controllers
 
         [HttpPost]
         [Route("~/api/Orders/NewOrder")]
-        public async Task<IActionResult> NewOrder([FromBody] OrderVM orderVM)
+        public async Task<ActionResult<OrderVM>> NewOrder([FromBody] OrderVM orderVM)
         {
             if (!ModelState.IsValid)
             {
@@ -293,7 +298,7 @@ namespace MyAngularApp.Controllers
 
             orderVM = new OrderVM
             {
-                id = order.Id,
+                id = 2,
                 cityName = order.City.Name,
                 customerName = order.Customer.Name,
                 dateReceived = order.DateReceived,
@@ -308,7 +313,7 @@ namespace MyAngularApp.Controllers
 
         [HttpPost]
         [Route("~/api/Orders/ScheduleOrders")]
-        public async Task<IActionResult> ScheduleOrders()
+        public async Task<ActionResult<int>> ScheduleOrders()
         {
             if (!ModelState.IsValid)
             {
@@ -350,6 +355,7 @@ namespace MyAngularApp.Controllers
             order.Asset = completedOrderVM.Asset;
 
             _context.Entry(order).State = EntityState.Modified;
+            //_context.MarkAsModified(order);
 
             try
             {

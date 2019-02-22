@@ -15,13 +15,13 @@ using static MyAngularApp.Controllers.OrdersController;
 namespace Tests
 {
     [TestFixture]
-    public class ControllerTests
+    public class TestOrderController
     {
         private OrdersController ordersController;
         private Context context;
 
         //[SetUp]
-        public ControllerTests()
+        public TestOrderController()
         {
             var builder = new DbContextOptionsBuilder<Context>()
              .UseInMemoryDatabase("dbContext").EnableSensitiveDataLogging();

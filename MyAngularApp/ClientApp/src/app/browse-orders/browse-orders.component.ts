@@ -1,13 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { OrderDataService } from '../services/order-data.service';
 import { Router, ActivatedRoute,  } from '@angular/router';
-
 import { Subscription, Subject } from 'rxjs';
-
 import { ToastrService } from 'ngx-toastr';
-
+import { OrderDataService } from '../services/order-data.service';
 import { OrderCompositeService } from '../services/order-composite.service';
-
 import { Order } from '../domain/domain';
 import { Status } from '../domain/domain';
 

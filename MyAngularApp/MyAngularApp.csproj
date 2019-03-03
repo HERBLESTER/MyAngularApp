@@ -32,10 +32,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\testing\activated-route-stub.ts" />
+    <None Remove="ClientApp\src\testing\metadata-service-stub.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="ClientApp\src\app\state-store\actions\" />
     <Folder Include="ClientApp\src\app\state-store\effects\" />
     <Folder Include="ClientApp\src\app\state-store\reducers\" />
     <Folder Include="ClientApp\src\app\state-store\state\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\testing\activated-route-stub.ts" />
+    <TypeScriptCompile Include="ClientApp\src\testing\metadata-service-stub.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
